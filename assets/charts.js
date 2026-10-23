@@ -5,6 +5,8 @@
   function el(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
   function pct(b) { return (Math.exp(b) - 1) * 100; }
   function fmt1(x) { return (Math.round(x * 10) / 10).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
+  function track(name, params) { if (window.siteTrack) window.siteTrack(name, params); }
+  function figName(node) { var f = node.closest && node.closest('[data-fig]'); return f ? f.dataset.fig : ''; }
   function fmt0(x) { return Math.round(x).toLocaleString('en-US'); }
   function niceTicks(lo, hi, n) { var span = hi - lo, step = Math.pow(10, Math.floor(Math.log10(span / n))); var err = span / n / step; step *= err >= 7.5 ? 10 : err >= 3 ? 5 : err >= 1.5 ? 2 : 1; var t = [], v = Math.ceil(lo / step) * step; for (; v <= hi + 1e-9; v += step) t.push(Math.round(v * 1e6) / 1e6); return t; }
 
@@ -54,7 +56,7 @@
 
   function buttons(host, items, onChange) {
     var row = document.createElement('div'); row.className = 'seg';
-    items.forEach(function (it, i) { var b = document.createElement('button'); b.type = 'button'; b.textContent = it.label; b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false'); b.addEventListener('click', function () { row.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); onChange(it.key); }); row.appendChild(b); });
+    items.forEach(function (it, i) { var b = document.createElement('button'); b.type = 'button'; b.textContent = it.label; b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false'); b.addEventListener('click', function () { row.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); track('figure_option', { figure: figName(host), option: it.label }); onChange(it.key); }); row.appendChild(b); });
     host.appendChild(row); return row;
   }
 
@@ -461,7 +463,8 @@
       guess[xk] = yv; lastX = xk; redrawGuess();
       if (complete()) reveal();
     }
-    svg.addEventListener('pointerdown', function (ev) { if (revealed) return; drawing = true; lastX = null; svg.setPointerCapture(ev.pointerId); onMove(ev); });
+    var stroked = false;
+    svg.addEventListener('pointerdown', function (ev) { if (revealed) return; drawing = true; lastX = null; svg.setPointerCapture(ev.pointerId); onMove(ev); if (!stroked) { stroked = true; track('draw_start', { figure: figName(root) }); } });
     svg.addEventListener('pointermove', onMove);
     svg.addEventListener('pointerup', function () { drawing = false; lastX = null; });
     svg.addEventListener('pointercancel', function () { drawing = false; lastX = null; });
@@ -471,6 +474,7 @@
     var read = document.createElement('p'); read.className = 'overall-line'; root.appendChild(read);
     function reveal() {
       if (revealed) return; revealed = true; drawing = false; hint.style.opacity = 0;
+      track('draw_reveal', { figure: figName(root), drew: stroked, finished: complete() });
       while (realG.firstChild) realG.removeChild(realG.firstChild);
       var last = cfg.known[cfg.known.length - 1], real = [last].concat(cfg.hidden);
       cfg.hidden.forEach(function (p) { if (p.lo !== undefined) el('line', { x1: X(p.x), x2: X(p.x), y1: Y(p.lo), y2: Y(p.hi), class: 'ci' }, realG); });
@@ -483,7 +487,7 @@
       if (cfg.extra && cfg.extra.length) { var lg = document.createElement('div'); lg.className = 'legend-row'; [{ label: cfg.realLabel || 'The data', cls: 'l-real' }].concat(cfg.extra.map(function (ex) { return { label: ex.label, cls: ex.cls }; })).concat([{ label: 'Your guess', cls: 'l-guess' }]).forEach(function (l) { var s = document.createElement('span'); s.className = 'lg ' + l.cls; s.textContent = l.label; lg.appendChild(s); }); plot.appendChild(lg); }
     }
     show.addEventListener('click', function () { reveal(); });
-    again.addEventListener('click', function () { guess = {}; revealed = false; realG.setAttribute('opacity', 0); while (realG.firstChild) realG.removeChild(realG.firstChild); redrawGuess(); show.hidden = false; again.hidden = true; read.innerHTML = ''; var lg = plot.querySelector('.legend-row'); if (lg) lg.remove(); });
+    again.addEventListener('click', function () { track('draw_again', { figure: figName(root) }); stroked = false; guess = {}; revealed = false; realG.setAttribute('opacity', 0); while (realG.firstChild) realG.removeChild(realG.firstChild); redrawGuess(); show.hidden = false; again.hidden = true; read.innerHTML = ''; var lg = plot.querySelector('.legend-row'); if (lg) lg.remove(); });
     redrawGuess();
   }
 
@@ -522,7 +526,7 @@
     var ctrl = document.createElement('div'); ctrl.className = 'fig-controls fig-controls-row'; root.appendChild(ctrl);
     var sel = document.createElement('select'); sel.className = 'select'; sel.setAttribute('aria-label', 'Choose a state');
     Object.keys(STATE_NAMES).sort(function (a, b) { return STATE_NAMES[a] < STATE_NAMES[b] ? -1 : 1; }).forEach(function (k) { if (!T.keywords.vpn[k]) return; var o = document.createElement('option'); o.value = k; o.textContent = STATE_NAMES[k]; if (k === state.st) o.selected = true; sel.appendChild(o); });
-    sel.addEventListener('change', function () { state.st = sel.value; draw(); }); ctrl.appendChild(sel);
+    sel.addEventListener('change', function () { state.st = sel.value; track('state_select', { figure: 'pornTrends', state: sel.value }); draw(); }); ctrl.appendChild(sel);
     buttons(ctrl, [{ key: 'vpn', label: 'Searches for VPN' }, { key: 'pornhub', label: 'Searches for Pornhub' }, { key: 'porn', label: 'Searches for porn' }], function (k) { state.kw = k; draw(); });
     var plot = document.createElement('div'); plot.className = 'plot'; root.appendChild(plot);
     var p = document.createElement('p'); p.className = 'overall-line'; root.appendChild(p);
@@ -609,12 +613,13 @@
           if (answered) return; answered = true;
           var vals = [U[R.key][ia], U[R.key][ib]], win = vals[1] > vals[0] ? 1 : 0;
           if (j === win) right++;
+          track('duel_pick', { figure: 'datingDesc', round: i + 1, pick: [A, B][j], correct: j === win });
           picks.querySelectorAll('button').forEach(function (x, k) { x.disabled = true; x.classList.toggle('win', k === win); x.classList.toggle('mine', k === j); });
           animate(vals);
           var w = { name: [A, B][win], v: R.fmt(vals[win]) }, l = { v: R.fmt(vals[1 - win]), lname: [A, B][1 - win].toLowerCase() };
           say.textContent = R.say(w, l);
           next.textContent = i < ROUNDS.length - 1 ? 'Next' : 'Play again'; next.hidden = false;
-          if (i === ROUNDS.length - 1) { var wins = ROUNDS.filter(function (r) { return U[r.key][ib] > U[r.key][ia]; }).length; tally.textContent = 'AI companions came out ahead in ' + ['', 'one', 'two', 'three', 'four', 'five'][wins] + ' of the five rounds and dating apps in ' + ['', 'one', 'two', 'three', 'four', 'five'][5 - wins] + '. You picked the winner in ' + right + ' of the five.'; tally.hidden = false; }
+          if (i === ROUNDS.length - 1) { var wins = ROUNDS.filter(function (r) { return U[r.key][ib] > U[r.key][ia]; }).length; tally.textContent = 'AI companions came out ahead in ' + ['', 'one', 'two', 'three', 'four', 'five'][wins] + ' of the five rounds and dating apps in ' + ['', 'one', 'two', 'three', 'four', 'five'][5 - wins] + '. You picked the winner in ' + right + ' of the five.'; tally.hidden = false; track('duel_finish', { figure: 'datingDesc', score: right }); }
         });
       });
     }

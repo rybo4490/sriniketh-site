@@ -111,7 +111,8 @@
         if (m >= end) { clearInterval(timer); timer = null; }
       }, 140);
     }
-    if (scrub) scrub.addEventListener('input', function () { clearInterval(timer); timer = null; show(current, +scrub.value); });
+    var scrubbed = false;
+    if (scrub) scrub.addEventListener('input', function () { clearInterval(timer); timer = null; show(current, +scrub.value); if (!scrubbed) { scrubbed = true; if (window.siteTrack) window.siteTrack('map_scrub', { layer: current }); } });
     host.querySelectorAll('.layer').forEach(function (b) {
       b.addEventListener('click', function () {
         current = b.dataset.layer;
@@ -119,7 +120,7 @@
         play(current);
       });
     });
-    host.querySelector('.replay').addEventListener('click', function () { play(current); });
+    host.querySelector('.replay').addEventListener('click', function () { if (window.siteTrack) window.siteTrack('map_replay', { layer: current }); play(current); });
     play(current);
     // repaint colors when the theme changes
     var mo = new MutationObserver(function () { var ds = Object.keys(LAYERS[current].dates).map(function (k) { return LAYERS[current].dates[k]; }).sort(); if (!timer) render(current, idx(ds[ds.length - 1])); });
@@ -130,7 +131,7 @@
     var b = document.querySelector('.theme-toggle');
     if (b) b.addEventListener('click', function () {
       var next = effective() === 'dark' ? 'light' : 'dark';
-      root.setAttribute('data-theme', next);
+      root.setAttribute('data-theme', next); if (window.siteTrack) window.siteTrack('theme_toggle', { theme: next });
       try { localStorage.setItem('theme', next); } catch (e) {}
     });
     buildMap();
