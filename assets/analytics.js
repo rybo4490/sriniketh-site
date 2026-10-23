@@ -1,6 +1,6 @@
 // Google Analytics 4. Put the property's measurement ID (it starts with G-) in GA_ID and every page starts reporting.
 (function () {
-  var GA_ID = '';
+  var GA_ID = 'G-K9BYYPVBEF';
   var started = false;
   function gtag() { window.dataLayer = window.dataLayer || []; window.dataLayer.push(arguments); }
   function start(id) {
