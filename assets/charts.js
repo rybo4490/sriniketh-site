@@ -574,8 +574,8 @@
     var ROUNDS = [
       { q: 'Which do people spend more time on, on a day they use it?', key: 'Minutes on a day of use, median', fmt: function (v) { return fmt1(v) + ' minutes'; }, say: function (w, l) { return w.name + '. A median of ' + w.v + ' on a day of use, compared with ' + l.v + ' on ' + l.lname + '.'; } },
       { q: 'Which gets the longer visit?', key: 'Median visit', fmt: function (v) { return fmt0(v) + ' seconds'; }, say: function (w, l) { return w.name + '. The median visit lasts ' + w.v + ', compared with ' + l.v + ' on ' + l.lname + '.'; } },
+      { q: 'Which do people come back to on more days?', key: 'Median days used', fmt: function (v) { return fmt0(v) + ' days'; }, say: function (w, l) { return w.name + '. The median user opens them on ' + w.v + ', compared with ' + l.v + ' for ' + l.lname + '.'; } },
       { q: 'Which is more often the first thing people open after unlocking the phone?', key: 'First thing after unlocking the phone', fmt: function (v) { return fmt0(v) + ' percent of visits'; }, say: function (w, l) { return w.name + '. ' + w.v + ' are the first thing after unlocking, compared with ' + l.v + ' on ' + l.lname + '.'; } },
-      { q: 'Which has more visits of five minutes or longer?', key: 'Visits of five minutes or more', fmt: function (v) { return fmt0(v) + ' percent of visits'; }, say: function (w, l) { return w.name + '. ' + w.v + ' last five minutes or longer, compared with ' + l.v + ' on ' + l.lname + '.'; } },
       { q: 'Which has more users aged 18 to 24?', key: 'Aged 18 to 24', fmt: function (v) { return fmt0(v) + ' percent'; }, say: function (w, l) { return w.name + '. ' + w.v + ' of their users are aged 18 to 24, compared with ' + l.v + ' of ' + l.lname + ' users.'; } }
     ];
     var box = document.createElement('div'); box.className = 'duel'; root.appendChild(box);
@@ -614,7 +614,7 @@
           var w = { name: [A, B][win], v: R.fmt(vals[win]) }, l = { v: R.fmt(vals[1 - win]), lname: [A, B][1 - win].toLowerCase() };
           say.textContent = R.say(w, l);
           next.textContent = i < ROUNDS.length - 1 ? 'Next' : 'Play again'; next.hidden = false;
-          if (i === ROUNDS.length - 1) { tally.textContent = 'AI companions came out ahead in all five. You picked the winner in ' + right + ' of the five.'; tally.hidden = false; }
+          if (i === ROUNDS.length - 1) { var wins = ROUNDS.filter(function (r) { return U[r.key][ib] > U[r.key][ia]; }).length; tally.textContent = 'AI companions came out ahead in ' + ['', 'one', 'two', 'three', 'four', 'five'][wins] + ' of the five rounds and dating apps in ' + ['', 'one', 'two', 'three', 'four', 'five'][5 - wins] + '. You picked the winner in ' + right + ' of the five.'; tally.hidden = false; }
         });
       });
     }
