@@ -622,7 +622,39 @@
     show();
   }
 
-  var FIGS = { cigDraw: figCigDraw, adsDraw: figAdsDraw, cigAds: figCigAds, dobbsTrends: figDobbsTrends, gamblingHandles: figGamblingHandles, datingDesc: figDatingDesc, pornTrends: figPornTrends, dobbsWeekly: figDobbsWeekly, porn: figPorn, dating: figDating, cigCohorts: figCigCohorts, cigIntl: figCigIntl, cigDeaths: figCigDeaths, dobbs: figDobbs, dobbsBrowsers: figDobbsBrowsers, gamblingAtts: figGamblingAtts, gamblingCalc: figGamblingCalc };
+  // ------------------------------------------------------------------ gambling: lottery sales by state around the launch of online sports betting
+  function figLottery(root) {
+    var L = window.SITE_DATA.gambling.lottery, state = { st: 'PA' };
+    var ctrl = document.createElement('div'); ctrl.className = 'fig-controls fig-controls-row'; root.appendChild(ctrl);
+    var sel = document.createElement('select'); sel.className = 'select'; sel.setAttribute('aria-label', 'Choose a state');
+    Object.keys(L.per_person).sort(function (a, b) { return STATE_NAMES[a] < STATE_NAMES[b] ? -1 : 1; }).forEach(function (k) { var o = document.createElement('option'); o.value = k; o.textContent = STATE_NAMES[k]; if (k === state.st) o.selected = true; sel.appendChild(o); });
+    sel.addEventListener('change', function () { state.st = sel.value; draw(); }); ctrl.appendChild(sel);
+    var plot = document.createElement('div'); plot.className = 'plot'; root.appendChild(plot);
+    var p = document.createElement('p'); p.className = 'overall-line'; root.appendChild(p);
+    function mean(a) { a = a.filter(function (x) { return x !== null && x !== undefined; }); return a.length ? a.reduce(function (s, x) { return s + x; }, 0) / a.length : null; }
+    function dir(a, b, up, down) { var ch = (a - b) / b * 100; return fmt0(Math.abs(ch)) + ' percent ' + (ch >= 0 ? up : down); }
+    var never = Object.keys(L.per_person).filter(function (k) { return !L.launch[k]; });
+    var avg = L.months.map(function (m, i) { return mean(never.map(function (k) { return L.per_person[k][i]; })); });
+    function draw() {
+      var months = L.months, mine = L.per_person[state.st], name = (state.st === 'DC' ? 'the ' : '') + STATE_NAMES[state.st], launch = L.launch[state.st], li = launch ? months.indexOf(launch) : -1;
+      var first = 0; while (mine[first] === null) first++;
+      var lines = [{ label: name, pts: months.map(function (m, i) { return { x: i, y: mine[i] }; }).filter(function (q) { return q.y !== null; }), cls: 'l-main' }, { label: 'Average of states with no online sports betting', pts: months.map(function (m, i) { return { x: i, y: avg[i] }; }), cls: 'l-ref' }];
+      var ticks = []; months.forEach(function (m, i) { if (m.slice(5) === '01') ticks.push(i); });
+      lineChart(plot, lines, { xLabel: '', yLabel: 'Lottery sales per person (dollars a month)', xTicks: ticks, xFmt: function (i) { return months[i].slice(0, 4); }, vline: li >= 0 ? li - 0.5 : null, vlineLabel: li >= 0 ? 'Online sports betting opens, ' + monthLabel(launch) : '', ymin: 0, yFmt: fmt0, aria: 'Monthly lottery sales per person in ' + name });
+      var last = months.length - 1; while (last > 0 && mine[last] === null) last--;
+      if (li >= 0 && li - first >= 12 && last >= li) {
+        var k = Math.min(12, last + 1 - li), span = k === 12 ? '12 months' : k + ' months';
+        p.innerHTML = 'Online sports betting opened in <strong>' + name + '</strong> in ' + monthLabel(launch) + '. In the ' + span + ' after, people in ' + name + ' spent <strong>' + dir(mean(mine.slice(li, li + k)), mean(mine.slice(li - 12, li)), 'more', 'less') + '</strong> on lottery tickets than in the 12 months before. In the states with no online sports betting, lottery spending over the same months was ' + dir(mean(avg.slice(li, li + k)), mean(avg.slice(li - 12, li)), 'higher', 'lower') + '.';
+      } else if (li >= 0) {
+        p.textContent = 'Online sports betting opened in ' + name + ' in ' + monthLabel(launch) + (last < li ? ', after the lottery data for ' + name + ' end in ' + monthLabel(months[last]) + '.' : '.');
+      } else {
+        p.textContent = name + ' had no online sports betting through March 2023, the last month of the lottery data.';
+      }
+    }
+    draw();
+  }
+
+  var FIGS = { lottery: figLottery, cigDraw: figCigDraw, adsDraw: figAdsDraw, cigAds: figCigAds, dobbsTrends: figDobbsTrends, gamblingHandles: figGamblingHandles, datingDesc: figDatingDesc, pornTrends: figPornTrends, dobbsWeekly: figDobbsWeekly, porn: figPorn, dating: figDating, cigCohorts: figCigCohorts, cigIntl: figCigIntl, cigDeaths: figCigDeaths, dobbs: figDobbs, dobbsBrowsers: figDobbsBrowsers, gamblingAtts: figGamblingAtts, gamblingCalc: figGamblingCalc };
   document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('[data-fig]').forEach(function (n) { var f = FIGS[n.dataset.fig]; if (f && window.SITE_DATA) f(n); });
   });
