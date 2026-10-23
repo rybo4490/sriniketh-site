@@ -291,6 +291,14 @@ main { flex: 1 0 auto; padding: 52px 0 72px; }
 .chart .l-bc { stroke: var(--av-1); stroke-width: 2; }
 .legend-row .lg.l-real::before { border-top-color: var(--ink); } .legend-row .lg.l-guess::before { border-top: 2px dashed var(--accent); } .legend-row .lg.l-bc::before { border-top-color: var(--av-1); }
 .drawit-row { display: flex; gap: 8px; margin-top: 6px; }
+.duel-q { font-family: var(--display); font-weight: 600; font-size: 1.15rem; color: var(--ink); margin: 4px 0 10px; max-width: none; }
+.duel-picks { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.duel-pick { font-family: var(--display); font-weight: 600; font-size: 1rem; color: var(--ink); background: var(--bg); border: 2px solid var(--rule); border-radius: 999px; padding: 10px 22px; cursor: pointer; transition: border-color .15s, background .15s; }
+.duel-pick:hover:not(:disabled) { border-color: var(--ink-3); }
+.duel-pick:disabled { cursor: default; opacity: .55; }
+.duel-pick.win { opacity: 1; border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.duel-pick.mine:not(.win) { text-decoration: line-through; }
+.duel-tally { margin: 8px 0 0; font-weight: 600; color: var(--ink); max-width: none; }
 .fig-note { font-family: var(--display); font-size: 0.9rem; color: var(--ink-2); margin: 0 0 8px; }
 
 /* ---- in-place text editing on the published page ---- */

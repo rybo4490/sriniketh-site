@@ -568,13 +568,58 @@
     draw();
   }
 
-  // ------------------------------------------------------------------ dating: minutes a day on each kind of app
+  // ------------------------------------------------------------------ dating: dating apps against AI companions, round by round
   function figDatingDesc(root) {
-    var D = window.SITE_DATA.dating_desc, vals = D.usage['Minutes on a day of use, median'];
-    var plot = document.createElement('div'); plot.className = 'plot'; root.appendChild(plot);
-    hbars(plot, D.kinds.map(function (k, i) { return { label: k, y: vals[i], cls: 'k' + i }; }), { xLabel: 'Minutes on a day the app was used (median)', fmt: fmt1 });
-    var p = document.createElement('p'); p.className = 'overall-line'; root.appendChild(p);
-    p.textContent = 'On a day they used the app, people spent a median of ' + fmt1(vals[2]) + ' minutes with an AI companion, ' + fmt1(vals[0]) + ' minutes on dating apps, ' + fmt1(vals[3]) + ' minutes on an AI girlfriend app and ' + fmt1(vals[1]) + ' minutes with a general AI assistant.';
+    var D = window.SITE_DATA.dating_desc, U = D.usage, A = 'Dating apps', B = 'AI companions', ia = D.kinds.indexOf(A), ib = D.kinds.indexOf(B);
+    var ROUNDS = [
+      { q: 'Which do people spend more time on, on a day they use it?', key: 'Minutes on a day of use, median', fmt: function (v) { return fmt1(v) + ' minutes'; }, say: function (w, l) { return w.name + '. A median of ' + w.v + ' on a day of use, compared with ' + l.v + ' on ' + l.lname + '.'; } },
+      { q: 'Which gets the longer visit?', key: 'Median visit', fmt: function (v) { return fmt0(v) + ' seconds'; }, say: function (w, l) { return w.name + '. The median visit lasts ' + w.v + ', compared with ' + l.v + ' on ' + l.lname + '.'; } },
+      { q: 'Which is more often the first thing people open after unlocking the phone?', key: 'First thing after unlocking the phone', fmt: function (v) { return fmt0(v) + ' percent of visits'; }, say: function (w, l) { return w.name + '. ' + w.v + ' are the first thing after unlocking, compared with ' + l.v + ' on ' + l.lname + '.'; } },
+      { q: 'Which has more visits of five minutes or longer?', key: 'Visits of five minutes or more', fmt: function (v) { return fmt0(v) + ' percent of visits'; }, say: function (w, l) { return w.name + '. ' + w.v + ' last five minutes or longer, compared with ' + l.v + ' on ' + l.lname + '.'; } },
+      { q: 'Which has more users aged 18 to 24?', key: 'Aged 18 to 24', fmt: function (v) { return fmt0(v) + ' percent'; }, say: function (w, l) { return w.name + '. ' + w.v + ' of their users are aged 18 to 24, compared with ' + l.v + ' of ' + l.lname + ' users.'; } }
+    ];
+    var box = document.createElement('div'); box.className = 'duel'; root.appendChild(box);
+    var q = document.createElement('p'); q.className = 'duel-q'; box.appendChild(q);
+    var picks = document.createElement('div'); picks.className = 'duel-picks'; box.appendChild(picks);
+    var W = 640, rowH = 44, m = { t: 6, r: 24, b: 8, l: 150 }, H = m.t + m.b + 2 * rowH;
+    var plot = document.createElement('div'); plot.className = 'plot'; box.appendChild(plot);
+    var svg = el('svg', { viewBox: '0 0 ' + W + ' ' + H, class: 'chart duel-chart', role: 'img' }, plot);
+    var bars = [A, B].map(function (name, i) {
+      var y = m.t + rowH * i, g = el('g', {}, svg);
+      var t = el('text', { x: m.l - 12, y: y + rowH / 2 + 4, class: 'rowlabel', 'text-anchor': 'end' }, g); t.textContent = name;
+      var r = el('rect', { x: m.l, y: y + 10, width: 0, height: rowH - 20, rx: 3, class: 'hbar ' + (i ? 'k2' : 'k0') }, g);
+      return { r: r };
+    });
+    var say = document.createElement('p'); say.className = 'overall-line'; box.appendChild(say);
+    var tally = document.createElement('p'); tally.className = 'duel-tally'; tally.hidden = true; box.appendChild(tally);
+    var row = document.createElement('div'); row.className = 'drawit-row'; box.appendChild(row);
+    var next = document.createElement('button'); next.type = 'button'; next.className = 'replay'; row.appendChild(next);
+    var i = 0, right = 0, answered = false;
+    function animate(vals) {
+      var hi = Math.max(vals[0], vals[1]) * 1.08, t0 = null;
+      function step(ts) { if (t0 === null) t0 = ts; var k = Math.min(1, (ts - t0) / 800), e = 1 - Math.pow(1 - k, 3); bars.forEach(function (b, j) { b.r.setAttribute('width', Math.max(1, vals[j] / hi * (W - m.l - m.r) * e)); }); if (k < 1) requestAnimationFrame(step); }
+      requestAnimationFrame(step);
+    }
+    function show() {
+      var R = ROUNDS[i]; answered = false; q.textContent = R.q; picks.innerHTML = ''; say.textContent = ''; tally.hidden = true; next.hidden = true;
+      bars.forEach(function (b) { b.r.setAttribute('width', 0); });
+      [A, B].forEach(function (name, j) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'duel-pick'; b.textContent = name; picks.appendChild(b);
+        b.addEventListener('click', function () {
+          if (answered) return; answered = true;
+          var vals = [U[R.key][ia], U[R.key][ib]], win = vals[1] > vals[0] ? 1 : 0;
+          if (j === win) right++;
+          picks.querySelectorAll('button').forEach(function (x, k) { x.disabled = true; x.classList.toggle('win', k === win); x.classList.toggle('mine', k === j); });
+          animate(vals);
+          var w = { name: [A, B][win], v: R.fmt(vals[win]) }, l = { v: R.fmt(vals[1 - win]), lname: [A, B][1 - win].toLowerCase() };
+          say.textContent = R.say(w, l);
+          next.textContent = i < ROUNDS.length - 1 ? 'Next' : 'Play again'; next.hidden = false;
+          if (i === ROUNDS.length - 1) { tally.textContent = 'AI companions came out ahead in all five. You picked the winner in ' + right + ' of the five.'; tally.hidden = false; }
+        });
+      });
+    }
+    next.addEventListener('click', function () { if (i < ROUNDS.length - 1) { i++; } else { i = 0; right = 0; } show(); });
+    show();
   }
 
   var FIGS = { cigDraw: figCigDraw, adsDraw: figAdsDraw, cigAds: figCigAds, dobbsTrends: figDobbsTrends, gamblingHandles: figGamblingHandles, datingDesc: figDatingDesc, pornTrends: figPornTrends, dobbsWeekly: figDobbsWeekly, porn: figPorn, dating: figDating, cigCohorts: figCigCohorts, cigIntl: figCigIntl, cigDeaths: figCigDeaths, dobbs: figDobbs, dobbsBrowsers: figDobbsBrowsers, gamblingAtts: figGamblingAtts, gamblingCalc: figGamblingCalc };
