@@ -292,10 +292,6 @@ main { flex: 1 0 auto; padding: 52px 0 72px; }
 .legend-row .lg.l-real::before { border-top-color: var(--ink); } .legend-row .lg.l-guess::before { border-top: 2px dashed var(--accent); } .legend-row .lg.l-bc::before { border-top-color: var(--av-1); }
 .drawit-row { display: flex; gap: 8px; margin-top: 6px; }
 .fig-note { font-family: var(--display); font-size: 0.9rem; color: var(--ink-2); margin: 0 0 8px; }
-.chart .gbar-guess { fill: var(--accent); opacity: .45; }
-.chart.revealed .gbar-guess { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; opacity: 1; }
-.chart.revealed .guess-zone { opacity: 0; }
-.legend-row .lg.b-real::before { border-top: none; height: 10px; background: var(--ink-3); border-radius: 2px; } .legend-row .lg.b-guess::before { border-top: none; height: 8px; border: 2px dashed var(--accent); border-radius: 2px; }
 
 /* ---- in-place text editing on the published page ---- */
 .editbar { position: fixed; right: 16px; bottom: 16px; z-index: 20; display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--rule); border-radius: 999px; padding: 6px 8px 6px 12px; box-shadow: 0 6px 24px rgba(0,0,0,.12); max-width: calc(100% - 32px); }
