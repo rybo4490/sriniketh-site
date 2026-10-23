@@ -29,9 +29,9 @@
       dates: { NJ: '2018-08', WV: '2018-12', PA: '2019-05', IA: '2019-08', RI: '2019-09', IN: '2019-10', OR: '2019-10', NH: '2019-12', CO: '2020-05', DC: '2020-05', IL: '2020-06', TN: '2020-11', MI: '2021-01', VA: '2021-01', AZ: '2021-09', WY: '2021-09', CT: '2021-10', LA: '2022-01', NY: '2022-01', AR: '2022-03', KS: '2022-09', MD: '2022-11', OH: '2023-01', MA: '2023-03', KY: '2023-09', FL: '2023-11', ME: '2023-11' }
     },
     av: {
-      label: 'Pornography age verification', note: 'Month each state’s age-verification law for pornography sites took effect, 2023 to 2025, as used in Unexpected Outcomes of Vice Regulation.',
+      label: 'Pornography age verification', note: 'Month Pornhub blocked each state after its age-verification law for pornography sites took effect, 2023 to 2025, as used in Unexpected Outcomes of Vice Regulation. Louisiana’s law took effect in January 2023 and Pornhub complied there instead.',
       ramp: ['--av-0', '--av-1', '--av-2'],
-      dates: { LA: '2023-01', UT: '2023-05', AR: '2023-07', MS: '2023-07', VA: '2023-07', TX: '2023-09', MT: '2024-01', NC: '2024-01', ID: '2024-07', KS: '2024-07', KY: '2024-07', NE: '2024-07', IN: '2024-08', AL: '2024-10', OK: '2024-11', FL: '2025-01', SC: '2025-01', TN: '2025-01', GA: '2025-07', SD: '2025-07', WY: '2025-07' }
+      dates: { UT: '2023-05', VA: '2023-07', MS: '2023-07', AR: '2023-08', MT: '2024-01', NC: '2024-01', TX: '2024-03', ID: '2024-07', KS: '2024-07', KY: '2024-07', NE: '2024-07', IN: '2024-07', AL: '2024-10', OK: '2024-11', TN: '2025-01', FL: '2025-01', SC: '2025-01', SD: '2025-07', WY: '2025-07', ND: '2025-08', AZ: '2025-09', MO: '2025-11' }
     }
   };
   var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];

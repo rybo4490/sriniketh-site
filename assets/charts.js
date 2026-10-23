@@ -295,35 +295,6 @@
   var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   function monthLabel(ym) { return MON[+ym.slice(5, 7) - 1] + ' ' + ym.slice(0, 4); }
 
-  // ------------------------------------------------------------------ porn: Google searches by state
-  function figPornTrends(root) {
-    var T = window.SITE_DATA.porn.trends, state = { st: 'TX', kw: 'vpn' };
-    var ctrl = document.createElement('div'); ctrl.className = 'fig-controls fig-controls-row'; root.appendChild(ctrl);
-    var sel = document.createElement('select'); sel.className = 'select'; sel.setAttribute('aria-label', 'Choose a state');
-    Object.keys(STATE_NAMES).sort(function (a, b) { return STATE_NAMES[a] < STATE_NAMES[b] ? -1 : 1; }).forEach(function (k) { if (!T.keywords.vpn[k]) return; var o = document.createElement('option'); o.value = k; o.textContent = STATE_NAMES[k] + (T.law_month[k] ? ' · law ' + monthLabel(T.law_month[k]) : ''); if (k === state.st) o.selected = true; sel.appendChild(o); });
-    sel.addEventListener('change', function () { state.st = sel.value; draw(); }); ctrl.appendChild(sel);
-    buttons(ctrl, [{ key: 'vpn', label: 'Searches for VPN' }, { key: 'pornhub', label: 'Searches for Pornhub' }, { key: 'porn', label: 'Searches for porn' }], function (k) { state.kw = k; draw(); });
-    var plot = document.createElement('div'); plot.className = 'plot'; root.appendChild(plot);
-    var p = document.createElement('p'); p.className = 'overall-line'; root.appendChild(p);
-    function draw() {
-      var months = T.months, series = T.keywords[state.kw], mine = series[state.st];
-      var never = Object.keys(series).filter(function (k) { return !T.law_month[k]; });
-      var avg = months.map(function (m, i) { var v = never.map(function (k) { return series[k][i]; }).filter(function (x) { return x !== null; }); return v.length ? v.reduce(function (a, b) { return a + b; }, 0) / v.length : null; });
-      var law = T.law_month[state.st], li = law ? months.indexOf(law) : -1;
-      var lines = [{ label: STATE_NAMES[state.st], pts: months.map(function (m, i) { return { x: i, y: mine[i] }; }), cls: 'l-main' }, { label: 'Average of states with no law', pts: months.map(function (m, i) { return { x: i, y: avg[i] }; }), cls: 'l-ref' }];
-      var ticks = []; months.forEach(function (m, i) { if (m.slice(5) === '01' || m.slice(5) === '07') ticks.push(i); });
-      lineChart(plot, lines, { xLabel: '', yLabel: 'Google search interest (index)', xTicks: ticks, xFmt: function (i) { return monthLabel(months[i]); }, vline: li >= 0 ? li : null, vlineLabel: li >= 0 ? 'Law takes effect' : '', ymin: 0, aria: 'Monthly Google search interest in ' + STATE_NAMES[state.st] });
-      var what = { vpn: 'searches for VPNs', pornhub: 'searches for Pornhub', porn: 'searches for porn' }[state.kw];
-      if (li >= 0) {
-        var pre = mine.slice(Math.max(0, li - 12), li).filter(function (x) { return x !== null; }), post = mine.slice(li, li + 12).filter(function (x) { return x !== null; });
-        var pm = pre.reduce(function (a, b) { return a + b; }, 0) / pre.length, qm = post.reduce(function (a, b) { return a + b; }, 0) / post.length, ch = (qm - pm) / pm * 100;
-        p.innerHTML = 'In <strong>' + STATE_NAMES[state.st] + '</strong>, ' + what + ' in the 12 months after the law took effect in ' + monthLabel(law) + ' were <strong>' + fmt0(Math.abs(ch)) + ' percent ' + (ch >= 0 ? 'higher' : 'lower') + '</strong> than in the 12 months before.';
-      } else {
-        p.innerHTML = STATE_NAMES[state.st] + ' had no age-verification law in this period.';
-      }
-    }
-    draw();
-  }
 
   // ------------------------------------------------------------------ dobbs: weekly use around the leak
   function figDobbsWeekly(root) {
@@ -347,42 +318,6 @@
     draw();
   }
 
-  // ------------------------------------------------------------------ dating: descriptives from the smartphone panel
-  function figDatingDesc(root) {
-    var D = window.SITE_DATA.dating_desc, kinds = D.kinds, state = { tab: 'use', m: 'Median visit' };
-    var MEAS = [
-      { key: 'Median visit', label: 'Median visit (seconds)', fmt: fmt0, note: 'Companion visits last more than twice as long as dating app visits.' },
-      { key: 'Visits of five minutes or more', label: 'Visits of five minutes or more (percent)', fmt: fmt0, note: 'A quarter of companion visits last five minutes or more, compared with 8 percent of dating app visits.' },
-      { key: 'First thing after unlocking the phone', label: 'Visits that are the first thing after unlocking the phone (percent)', fmt: fmt0, note: 'Three in ten companion visits are the first thing a person does after unlocking the phone, compared with 12 percent of dating app visits.' },
-      { key: 'Minutes on a day of use, median', label: 'Minutes on a day of use, median', fmt: fmt1, note: 'On a day of use, people spend more time with a companion than dating app users spend on dating apps.' },
-      { key: 'Median days used', label: 'Days used, median', fmt: fmt0, note: 'Dating apps are a habit. General assistants are opened on a median of two days.' },
-      { key: 'Used on only one day', label: 'People who used the app on only one day (percent)', fmt: fmt0, note: 'Four in ten people who open a general assistant open it on only one day.' },
-      { key: 'Aged 18 to 24', label: 'Users aged 18 to 24 (percent)', fmt: fmt0, note: '38 percent of companion users are aged 18 to 24, compared with 13 percent of dating app users.' },
-      { key: 'Men', label: 'Users who are men (percent)', fmt: fmt0, note: 'Most users of AI girlfriend apps are men.' }
-    ];
-    var ctrl = document.createElement('div'); ctrl.className = 'fig-controls fig-controls-row'; root.appendChild(ctrl);
-    buttons(ctrl, [{ key: 'use', label: 'How people use them' }, { key: 'hour', label: 'Hour of the day' }], function (k) { state.tab = k; draw(); });
-    var sel = document.createElement('select'); sel.className = 'select'; sel.setAttribute('aria-label', 'Choose a measure');
-    MEAS.forEach(function (m) { var o = document.createElement('option'); o.value = m.key; o.textContent = m.label; sel.appendChild(o); });
-    sel.addEventListener('change', function () { state.m = sel.value; draw(); }); ctrl.appendChild(sel);
-    var plot = document.createElement('div'); plot.className = 'plot'; root.appendChild(plot);
-    var p = document.createElement('p'); p.className = 'overall-line'; root.appendChild(p);
-    function draw() {
-      sel.hidden = state.tab !== 'use';
-      if (state.tab === 'use') {
-        var m = MEAS.filter(function (x) { return x.key === state.m; })[0], vals = D.usage[m.key];
-        hbars(plot, kinds.map(function (k, i) { return { label: k, y: vals[i], cls: 'k' + i }; }), { xLabel: m.label, fmt: m.fmt });
-        p.textContent = m.note;
-      } else {
-        var names = { 'Dating app': 'Dating apps', 'General AI assistant': 'General AI assistants', 'AI companion': 'AI companions', 'AI girlfriend / romantic': 'AI girlfriend apps' };
-        var order = ['Dating app', 'General AI assistant', 'AI companion', 'AI girlfriend / romantic'];
-        lineChart(plot, order.map(function (k, i) { return { label: names[k], pts: D.hours[k].map(function (v, h) { return { x: h, y: v }; }), cls: 'l-k' + i }; }),
-          { xLabel: 'Hour of the day', yLabel: 'Share of visits (percent)', xTicks: [0, 6, 12, 18, 23], xFmt: function (h) { return h === 0 ? '12am' : h === 6 ? '6am' : h === 12 ? 'noon' : h === 18 ? '6pm' : '11pm'; }, ymin: 0, yFmt: fmt0, aria: 'Share of visits by hour of the day' });
-        p.textContent = 'People use dating apps and AI apps at the same hours of the day. All four are busiest at 9pm.';
-      }
-    }
-    draw();
-  }
   function hbars(host, rows, opts) {
     host.innerHTML = '';
     var W = 640, rowH = 40, m = { t: 8, r: 18, b: 44, l: 170 }, H = m.t + m.b + rows.length * rowH;
@@ -433,23 +368,6 @@
     draw();
   }
 
-  // ------------------------------------------------------------------ dobbs: Google searches around the leak and the decision
-  function figDobbsTrends(root) {
-    var T = window.SITE_DATA.dobbs.trends, state = { k: 'period tracker' };
-    var ctrl = document.createElement('div'); ctrl.className = 'fig-controls'; root.appendChild(ctrl);
-    buttons(ctrl, [{ key: 'period tracker', label: '“period tracker”' }, { key: 'period app', label: '“period app”' }, { key: 'Flo app', label: '“Flo app”' }], function (k) { state.k = k; draw(); });
-    var plot = document.createElement('div'); plot.className = 'plot'; root.appendChild(plot);
-    var d = T.dates, leak = d.indexOf('2022-05-02'), ruling = d.indexOf('2022-06-24');
-    function lab(i) { var m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'][+d[i].slice(5, 7) - 1]; return m + ' ' + (+d[i].slice(8)); }
-    function draw() {
-      var ticks = []; d.forEach(function (x, i) { if (x.slice(8) === '01') ticks.push(i); });
-      var ch = lineChart(plot, [{ label: 'Searches for “' + state.k + '”', pts: T.series[state.k].map(function (v, i) { return { x: i, y: v }; }), cls: 'l-main' }],
-        { xLabel: '2022', yLabel: 'Google search interest (index)', xTicks: ticks, xFmt: lab, vline: leak, vlineLabel: 'Draft opinion leaks', ymin: 0, yFmt: fmt0, aria: 'Daily Google searches in the United States' });
-      el('line', { x1: ch.X(ruling), x2: ch.X(ruling), y1: 18, y2: 274, class: 'vline' }, ch.svg);
-      var t = el('text', { x: ch.X(ruling) + 5, y: 30, class: 'tick' }, ch.svg); t.textContent = 'Court rules';
-    }
-    draw();
-  }
 
   // ------------------------------------------------------------------ cigarettes: where the advertising money went, 1963 to 1974
   function figCigAds(root) {
@@ -515,7 +433,7 @@
     niceTicks(cfg.ymin, cfg.ymax, 5).forEach(function (t) { el('line', { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t), class: 'grid' }, svg); var tx = el('text', { x: m.l - 8, y: Y(t) + 4, class: 'tick', 'text-anchor': 'end' }, svg); tx.textContent = (cfg.yFmt || fmt0)(t); });
     (cfg.xTicks || []).forEach(function (t) { var tx = el('text', { x: X(t), y: H - m.b + 18, class: 'tick', 'text-anchor': 'middle' }, svg); tx.textContent = cfg.xFmt ? cfg.xFmt(t) : t; });
     el('line', { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, class: 'axis' }, svg);
-    if (cfg.vline !== undefined) { el('line', { x1: X(cfg.vline), x2: X(cfg.vline), y1: m.t, y2: H - m.b, class: 'vline' }, svg); var vl = el('text', { x: X(cfg.vline) + 5, y: m.t + 11, class: 'tick' }, svg); vl.textContent = cfg.vlineLabel || ''; }
+    (cfg.vlines || (cfg.vline !== undefined ? [{ x: cfg.vline, label: cfg.vlineLabel }] : [])).forEach(function (v) { el('line', { x1: X(v.x), x2: X(v.x), y1: m.t, y2: H - m.b, class: 'vline' }, svg); var vl = el('text', { x: X(v.x) + 5, y: m.t + 11, class: 'tick' }, svg); vl.textContent = v.label || ''; });
     var xl = el('text', { x: (m.l + W - m.r) / 2, y: H - 8, class: 'label', 'text-anchor': 'middle' }, svg); xl.textContent = cfg.xLabel || '';
     var yl = el('text', { x: 14, y: (m.t + H - m.b) / 2, class: 'label', 'text-anchor': 'middle', transform: 'rotate(-90 14 ' + (m.t + H - m.b) / 2 + ')' }, svg); yl.textContent = cfg.yLabel || '';
     function path(pts) { return pts.map(function (p, i) { return (i ? 'L' : 'M') + X(p.x).toFixed(1) + ' ' + Y(p.y).toFixed(1); }).join(''); }
@@ -592,6 +510,140 @@
         var drop = (1 - r71.y / 314.7) * 100;
         return 'You drew $' + fmt0(g71) + ' million for 1971. Cigarette makers spent <strong>$' + fmt0(r71.y) + ' million</strong> in 1971, ' + fmt0(drop) + ' percent less than the $315 million of 1970. The $217 million they had spent on television and radio did not all move to print and billboards. Spending did not return to its 1970 level until ' + last.x + '.';
       } });
+  }
+
+  // ------------------------------------------------------------------ porn: Google searches by state, drawn after Pornhub leaves
+  function figPornTrends(root) {
+    var T = window.SITE_DATA.porn.trends, state = { st: 'TX', kw: 'vpn' };
+    var ctrl = document.createElement('div'); ctrl.className = 'fig-controls fig-controls-row'; root.appendChild(ctrl);
+    var sel = document.createElement('select'); sel.className = 'select'; sel.setAttribute('aria-label', 'Choose a state');
+    Object.keys(STATE_NAMES).sort(function (a, b) { return STATE_NAMES[a] < STATE_NAMES[b] ? -1 : 1; }).forEach(function (k) {
+      if (!T.keywords.vpn[k]) return;
+      var o = document.createElement('option'); o.value = k;
+      o.textContent = STATE_NAMES[k] + (T.block_month[k] ? ' · Pornhub left ' + monthLabel(T.block_month[k]) : T.complied[k] ? ' · law ' + monthLabel(T.complied[k]) + ', Pornhub stayed' : '');
+      if (k === state.st) o.selected = true; sel.appendChild(o);
+    });
+    sel.addEventListener('change', function () { state.st = sel.value; draw(); }); ctrl.appendChild(sel);
+    buttons(ctrl, [{ key: 'vpn', label: 'Searches for VPN' }, { key: 'pornhub', label: 'Searches for Pornhub' }, { key: 'porn', label: 'Searches for porn' }], function (k) { state.kw = k; draw(); });
+    var host = document.createElement('div'); root.appendChild(host);
+    function mean(a) { a = a.filter(function (x) { return x !== null && !isNaN(x); }); return a.length ? a.reduce(function (s, x) { return s + x; }, 0) / a.length : null; }
+    function pct(a, b) { return (a - b) / b * 100; }
+    function dir(ch) { return fmt0(Math.abs(ch)) + ' percent ' + (ch >= 0 ? 'higher' : 'lower'); }
+    function draw() {
+      host.innerHTML = '';
+      var series = T.keywords[state.kw], raw = series[state.st] || [], n = raw.length;
+      while (n > 0 && raw[n - 1] === null) n--;
+      var months = T.months.slice(0, n), mine = raw.slice(0, n);
+      for (var i = 0; i < n; i++) if (mine[i] === null) mine[i] = i ? mine[i - 1] : 0;
+      var never = Object.keys(series).filter(function (k) { return !T.block_month[k] && !T.complied[k]; });
+      var avg = months.map(function (m, i) { return mean(never.map(function (k) { return series[k][i]; })); });
+      var what = { vpn: 'searches for VPNs', pornhub: 'searches for Pornhub', porn: 'searches for porn' }[state.kw], name = STATE_NAMES[state.st];
+      var ticks = []; months.forEach(function (m, i) { if (m.slice(5) === '01' || m.slice(5) === '07') ticks.push(i); });
+      var block = T.block_month[state.st], bi = block ? months.indexOf(block) : -1;
+      var pts = months.map(function (m, i) { return { x: i, y: mine[i] }; }), ref = months.map(function (m, i) { return { x: i, y: avg[i] }; });
+      if (bi >= 12 && bi < n - 1) {
+        var top = Math.max.apply(null, mine.concat(avg.filter(function (x) { return x !== null; }))), ymax = Math.ceil(top * 1.4 / 10) * 10;
+        drawIt(host, { known: pts.slice(0, bi), hidden: pts.slice(bi), xLabel: '', yLabel: 'Google search interest (index)', ymin: 0, ymax: ymax, xTicks: ticks, xFmt: function (i) { return monthLabel(months[i]); },
+          vline: bi - 0.5, vlineLabel: 'Pornhub leaves', hint: 'Draw your guess', realLabel: name, extra: [{ label: 'Average of states with no law', pts: ref, cls: 'l-ref' }],
+          aria: 'Monthly Google search interest in ' + name + ', with the months after Pornhub left for you to draw',
+          readout: function (g, h) {
+            var k = Math.min(12, h.length), pre = mean(mine.slice(bi - 12, bi)), post = mean(mine.slice(bi, bi + k)), gpost = mean(h.slice(0, k).map(function (p) { return g[p.x]; }));
+            var rpre = mean(avg.slice(bi - 12, bi)), rpost = mean(avg.slice(bi, bi + k));
+            var span = k === 12 ? '12 months' : k + ' months';
+            return 'You drew ' + what + ' in ' + name + ' ' + dir(pct(gpost, pre)) + ' after Pornhub left than in the 12 months before. In the data, ' + what + ' in the ' + span + ' after Pornhub left in ' + monthLabel(block) + ' were <strong>' + dir(pct(post, pre)) + '</strong> than in the 12 months before. In the states with no law, ' + what + ' over the same months were ' + dir(pct(rpost, rpre)) + '.';
+          } });
+      } else {
+        var plot = document.createElement('div'); plot.className = 'plot'; host.appendChild(plot);
+        lineChart(plot, [{ label: name, pts: pts, cls: 'l-main' }, { label: 'Average of states with no law', pts: ref, cls: 'l-ref' }], { xLabel: '', yLabel: 'Google search interest (index)', xTicks: ticks, xFmt: function (i) { return monthLabel(months[i]); }, ymin: 0, aria: 'Monthly Google search interest in ' + name });
+        var p = document.createElement('p'); p.className = 'overall-line'; host.appendChild(p);
+        p.textContent = T.complied[state.st] ? name + ' required age checks from ' + monthLabel(T.complied[state.st]) + '. Pornhub checked ages there through the state’s own app instead of leaving, so there is nothing to draw.' : block ? 'Pornhub left ' + name + ' in ' + monthLabel(block) + ', too late in these data to draw what came next.' : name + ' has had no age-verification law for pornography sites.';
+      }
+    }
+    draw();
+  }
+
+  // ------------------------------------------------------------------ dobbs: daily Google searches, drawn after the leak
+  function figDobbsTrends(root) {
+    var T = window.SITE_DATA.dobbs.trends, state = { k: 'period tracker' };
+    var ctrl = document.createElement('div'); ctrl.className = 'fig-controls'; root.appendChild(ctrl);
+    buttons(ctrl, [{ key: 'period tracker', label: '“period tracker”' }, { key: 'period app', label: '“period app”' }], function (k) { state.k = k; draw(); });
+    var host = document.createElement('div'); root.appendChild(host);
+    var d = T.dates, leak = d.indexOf('2022-05-02'), ruling = d.indexOf('2022-06-24');
+    function lab(i) { var m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'][+d[i].slice(5, 7) - 1]; return m + ' ' + (+d[i].slice(8)); }
+    function draw() {
+      host.innerHTML = '';
+      var s = T.series[state.k], pts = s.map(function (v, i) { return { x: i, y: v }; });
+      var ticks = []; d.forEach(function (x, i) { if (x.slice(8) === '01') ticks.push(i); });
+      var ymax = Math.ceil(Math.max.apply(null, s) * 1.1 / 10) * 10, april = pts.slice(0, leak).reduce(function (a, p) { return a + p.y; }, 0) / leak;
+      drawIt(host, { known: pts.slice(0, leak), hidden: pts.slice(leak), xLabel: '2022', yLabel: 'Google search interest (index)', ymin: 0, ymax: ymax, xTicks: ticks, xFmt: lab,
+        vlines: [{ x: leak - 0.5, label: 'Draft opinion leaks' }, { x: ruling, label: 'Court rules' }], hint: 'Draw your guess', aria: 'Daily Google searches for ' + state.k + ' in the United States, April to July 2022',
+        readout: function (g, h) {
+          var mine = h.map(function (p) { return g[p.x]; }).filter(function (v) { return v !== undefined; }), gmax = mine.length ? Math.max.apply(null, mine) : null;
+          var peak = function (i) { return Math.max.apply(null, s.slice(i, i + 7)) / april; };
+          return (gmax === null ? '' : 'You drew searches for “' + state.k + '” peaking at ' + fmt1(gmax / april) + ' times their April level. ') + 'In the data, searches for “' + state.k + '” peaked at <strong>' + fmt1(peak(leak)) + ' times</strong> their April level in the week after the leak, and at <strong>' + fmt1(peak(ruling)) + ' times</strong> their April level in the week after the Court ruled. A week after the ruling they were ' + fmt1(s[ruling + 7] / april) + ' times their April level.';
+        } });
+    }
+    draw();
+  }
+
+  // ------------------------------------------------------------------ dating: minutes a day on each kind of app, guessed bar by bar
+  function figDatingDesc(root) {
+    var D = window.SITE_DATA.dating_desc, vals = D.usage['Minutes on a day of use, median'];
+    var rows = D.kinds.map(function (k, i) { return { label: k, y: vals[i], cls: 'k' + i }; });
+    guessBars(root, { rows: rows, xmax: 20, xLabel: 'Minutes on a day the app was used (median)', hint: 'Draw your guess', aria: 'Median minutes on a day of use, for dating apps and three kinds of AI app',
+      readout: function (g) {
+        var order = rows.slice().sort(function (a, b) { return b.y - a.y; }), gtop = rows.reduce(function (a, b) { return g[b.label] > g[a.label] ? b : a; });
+        var lower = function (s) { return s.replace(/^(Dating|General)/, function (w) { return w.toLowerCase(); }); };
+        var real = order.map(function (r, i) { return fmt1(r.y) + ' minutes on ' + lower(r.label); });
+        var mine = rows.map(function (r) { return fmt1(g[r.label]) + ' minutes on ' + lower(r.label); });
+        return 'You put ' + lower(gtop.label) + ' first' + (gtop === order[0] ? ', and so do the data. ' : '. In the data, ' + lower(order[0].label) + ' come first. ') + 'On a day they used the app, people spent a median of <strong>' + real[0] + '</strong>, ' + real[1] + ', ' + real[2] + ' and ' + real[3] + '. You guessed ' + mine.join(', ').replace(/, ([^,]*)$/, ' and $1') + '.';
+      } });
+  }
+
+  // horizontal bars the reader sets before the data are shown. cfg: {rows:[{label,y,cls}], xmax, xLabel, hint, readout(guess)}
+  function guessBars(root, cfg) {
+    var W = 640, rowH = 46, m = { t: 10, r: 24, b: 46, l: 170 }, n = cfg.rows.length, H = m.t + m.b + n * rowH;
+    var plot = document.createElement('div'); plot.className = 'plot drawit'; root.appendChild(plot);
+    var svg = el('svg', { viewBox: '0 0 ' + W + ' ' + H, class: 'chart gbars', role: 'img', 'aria-label': cfg.aria || '' }, plot);
+    var X = function (v) { return m.l + v / cfg.xmax * (W - m.l - m.r); }, Xinv = function (px) { return Math.max(0, Math.min(cfg.xmax, (px - m.l) / (W - m.l - m.r) * cfg.xmax)); };
+    el('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: n * rowH, class: 'guess-zone' }, svg);
+    niceTicks(0, cfg.xmax, 5).forEach(function (t) { el('line', { x1: X(t), x2: X(t), y1: m.t, y2: m.t + n * rowH, class: 'grid' }, svg); var tx = el('text', { x: X(t), y: m.t + n * rowH + 18, class: 'tick', 'text-anchor': 'middle' }, svg); tx.textContent = fmt0(t); });
+    var xl = el('text', { x: (m.l + W - m.r) / 2, y: H - 8, class: 'label', 'text-anchor': 'middle' }, svg); xl.textContent = cfg.xLabel || '';
+    var guess = {}, bars = [], revealed = false, active = null;
+    cfg.rows.forEach(function (r, i) {
+      var y = m.t + rowH * i;
+      var t = el('text', { x: m.l - 12, y: y + rowH / 2 + 4, class: 'rowlabel', 'text-anchor': 'end' }, svg); t.textContent = r.label;
+      var gb = el('rect', { x: m.l, y: y + 11, width: 0, height: rowH - 22, class: 'gbar-guess', rx: 3 }, svg);
+      var rb = el('rect', { x: m.l, y: y + 11, width: 0, height: rowH - 22, class: 'hbar ' + r.cls + ' gbar-real', rx: 3, opacity: 0 }, svg);
+      bars.push({ row: r, y: y, gb: gb, rb: rb });
+    });
+    var hint = el('text', { x: (m.l + W - m.r) / 2, y: m.t + n * rowH / 2 + 4, class: 'hint', 'text-anchor': 'middle' }, svg); hint.textContent = cfg.hint || 'Draw your guess';
+    function pos(ev) { var r = svg.getBoundingClientRect(); return { x: (ev.clientX - r.left) / r.width * W, y: (ev.clientY - r.top) / r.height * H }; }
+    function complete() { return cfg.rows.every(function (r) { return guess[r.label] !== undefined; }); }
+    function setGuess(ev) {
+      var p = pos(ev);
+      if (active === null) { var i = Math.floor((p.y - m.t) / rowH); if (i < 0 || i >= n) return; active = i; }
+      var b = bars[active], v = Xinv(p.x); guess[b.row.label] = v; b.gb.setAttribute('width', Math.max(2, X(v) - m.l)); hint.style.opacity = 0;
+    }
+    svg.addEventListener('pointerdown', function (ev) { if (revealed) return; ev.preventDefault(); active = null; svg.setPointerCapture(ev.pointerId); setGuess(ev); });
+    svg.addEventListener('pointermove', function (ev) { if (revealed || active === null) return; ev.preventDefault(); setGuess(ev); });
+    function up() { if (active === null) return; active = null; if (complete() && !revealed) setTimeout(reveal, 250); }
+    svg.addEventListener('pointerup', up); svg.addEventListener('pointercancel', up);
+    var row = document.createElement('div'); row.className = 'drawit-row'; root.appendChild(row);
+    var show = document.createElement('button'); show.type = 'button'; show.className = 'replay'; show.textContent = 'Show the data'; row.appendChild(show);
+    var again = document.createElement('button'); again.type = 'button'; again.className = 'replay'; again.textContent = 'Draw again'; again.hidden = true; row.appendChild(again);
+    var read = document.createElement('p'); read.className = 'overall-line'; root.appendChild(read);
+    function reveal() {
+      if (revealed) return; revealed = true; hint.style.opacity = 0; svg.classList.add('revealed');
+      cfg.rows.forEach(function (r) { if (guess[r.label] === undefined) guess[r.label] = 0; });
+      var t0 = null;
+      function step(ts) { if (t0 === null) t0 = ts; var k = Math.min(1, (ts - t0) / 900), e = 1 - Math.pow(1 - k, 3); bars.forEach(function (b) { b.rb.setAttribute('opacity', 1); b.rb.setAttribute('width', Math.max(1, (X(b.row.y) - m.l) * e)); }); if (k < 1) requestAnimationFrame(step); }
+      requestAnimationFrame(step);
+      show.hidden = true; again.hidden = false; read.innerHTML = cfg.readout(guess);
+      var lg = document.createElement('div'); lg.className = 'legend-row'; [{ label: 'The data', cls: 'b-real' }, { label: 'Your guess', cls: 'b-guess' }].forEach(function (l) { var s = document.createElement('span'); s.className = 'lg ' + l.cls; s.textContent = l.label; lg.appendChild(s); }); plot.appendChild(lg);
+    }
+    show.addEventListener('click', reveal);
+    again.addEventListener('click', function () { guess = {}; revealed = false; svg.classList.remove('revealed'); bars.forEach(function (b) { b.gb.setAttribute('width', 0); b.rb.setAttribute('width', 0); b.rb.setAttribute('opacity', 0); }); hint.style.opacity = 1; show.hidden = false; again.hidden = true; read.innerHTML = ''; var lg = plot.querySelector('.legend-row'); if (lg) lg.remove(); });
   }
 
   var FIGS = { cigDraw: figCigDraw, adsDraw: figAdsDraw, cigAds: figCigAds, dobbsTrends: figDobbsTrends, gamblingHandles: figGamblingHandles, datingDesc: figDatingDesc, pornTrends: figPornTrends, dobbsWeekly: figDobbsWeekly, porn: figPorn, dating: figDating, cigCohorts: figCigCohorts, cigIntl: figCigIntl, cigDeaths: figCigDeaths, dobbs: figDobbs, dobbsBrowsers: figDobbsBrowsers, gamblingAtts: figGamblingAtts, gamblingCalc: figGamblingCalc };
