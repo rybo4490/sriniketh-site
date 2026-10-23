@@ -41,7 +41,7 @@
   function cssVar(name) { return getComputedStyle(root).getPropertyValue(name); }
 
   function buildMap() {
-    var host = document.querySelector('.rollout'); if (!host) return;
+    var host = document.querySelector('.rollout'); if (!host || !host.querySelector('svg.map')) return;
     var svgNS = 'http://www.w3.org/2000/svg', size = 44, gap = 4, step = size + gap;
     var svg = host.querySelector('svg.map');
     svg.setAttribute('viewBox', '0 0 ' + (12 * step - gap) + ' ' + (8 * step - gap));
