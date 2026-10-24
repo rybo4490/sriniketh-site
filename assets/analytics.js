@@ -12,8 +12,7 @@
   window.siteAnalytics = { start: start };
   document.addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('a[href]'); if (!a) return;
-    var out = a.host !== location.host, file = /\.pdf$/i.test(a.pathname);
-    if (out || file) window.siteTrack(out ? 'outbound_click' : 'file_download', { link_url: a.href, link_text: (a.textContent || '').trim().slice(0, 60) });
+    if (a.host !== location.host) window.siteTrack('outbound_click', { link_url: a.href, link_text: (a.textContent || '').trim().slice(0, 60) });
   }, true);
   var marks = {}; function depth() { var h = document.documentElement, d = (h.scrollTop + window.innerHeight) / h.scrollHeight; [50, 90].forEach(function (k) { if (d >= k / 100 && !marks[k]) { marks[k] = true; window.siteTrack('scroll_depth', { percent: k }); } }); }
   window.addEventListener('scroll', depth, { passive: true });
