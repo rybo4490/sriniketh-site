@@ -38,8 +38,17 @@
       var from = off, t0 = null;
       (function step(ts) { if (t0 === null) t0 = ts; var k = Math.min(1, (ts - t0) / 1800), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; setOffset(from + h * e); anim = k < 1 ? requestAnimationFrame(step) : null; })(performance.now());
     }
+    var api = { alt: alt, hours: hours, real: real, noon: noon, dayLen: dayLen, colors: colors, setOffset: setOffset, shift: shift, offset: function () { return off; } };
+    api.locate = function (la, sr, ss, keep) {
+      if (typeof la !== 'number' || isNaN(la)) return; lat = Math.max(-66, Math.min(66, la)) * RAD;
+      dayLen = 2 * Math.acos(Math.max(-1, Math.min(1, -Math.tan(lat) * Math.tan(dc)))) / RAD / 15;
+      if (typeof sr === 'number' && typeof ss === 'number' && ss > sr) noon = (sr + ss) / 2;
+      api.noon = noon; api.dayLen = dayLen; apply();
+      if (!keep) try { sessionStorage.setItem('skyGeo', JSON.stringify({ lat: la, sr: sr, ss: ss, t: Date.now() })); } catch (e) {}
+    };
+    try { var sg = JSON.parse(sessionStorage.getItem('skyGeo') || 'null'); if (sg && Date.now() - sg.t < 6 * 36e5) api.locate(sg.lat, sg.sr, sg.ss, true); } catch (e) {}
     apply(); setInterval(apply, 60000);
-    return { alt: alt, hours: hours, real: real, noon: noon, dayLen: dayLen, colors: colors, setOffset: setOffset, shift: shift, offset: function () { return off; } };
+    return api;
   })();
 
   // ---- tile map of the US: row, col on a square grid ----

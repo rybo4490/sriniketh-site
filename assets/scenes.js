@@ -5,7 +5,7 @@
   function el(tag, cls, parent) { var e = document.createElement(tag); if (cls) e.className = cls; if (parent) parent.appendChild(e); return e; }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   var touch = window.matchMedia('(hover: none)').matches;
-  function hint(text, parent, cls) { var h = el('span', 'hint ' + (cls || ''), parent); h.setAttribute('aria-hidden', 'true'); h.textContent = text; return h; }
+  function hint(text, parent, cls) { var h = el('span', 'cue ' + (cls || ''), parent); h.setAttribute('aria-hidden', 'true'); h.textContent = text; return h; }
   function drop(h) { if (h) { h.classList.add('gone'); setTimeout(function () { h.remove(); }, 500); } }
 
   // ---------------------------------------------------------------- cigarettes: a cigarette that burns down as the page scrolls
@@ -127,7 +127,7 @@
       ['22 states', 'that Pornhub left rather than check ages'],
       ['Utah, May 2023', 'the first state Pornhub left'],
       ['2,052 counties', 'with FBI crime counts that we follow from 2022 to 2025']
-    ], box = el('div', 'redacts', head), opened = 0, chip = hint((touch ? 'Tap' : 'Click') + ' a black bar', head, 'hint-redact');
+    ], box = el('div', 'redacts', head), opened = 0, chip = hint((touch ? 'Tap' : 'Click') + ' a black bar', head, 'cue-redact');
     FACTS.forEach(function (F, n) {
       var b = el('button', 'redact', box); b.type = 'button'; b.setAttribute('aria-label', 'Show a fact from the paper'); el('b', '', b).textContent = F[0]; el('span', '', b).textContent = F[1]; el('i', '', b);
       function open(auto) { if (b.classList.contains('open')) return; b.classList.add('open'); b.removeAttribute('aria-label'); if (!auto && !opened++) { track('redact_open', {}); drop(chip); } }
@@ -197,7 +197,7 @@
       } });
     });
     stack();
-    var chip = hint(touch ? '\u2190 Swipe \u2192' : '\u2190 Drag \u2192', deck, 'hint-swipe');
+    var chip = hint(touch ? '\u2190 Swipe \u2192' : '\u2190 Drag \u2192', deck, 'cue-swipe');
     function wiggle() { if (flung) return; var c = order[0]; c.classList.add('nudge'); setTimeout(function () { c.classList.remove('nudge'); }, 1300); }
     if (!reduce) { setTimeout(wiggle, 1300); var wig = setInterval(function () { if (flung) clearInterval(wig); else wiggle(); }, 4200); }
     var q = document.querySelector('.duel-q'); if (!q) return;

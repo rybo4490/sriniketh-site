@@ -541,16 +541,21 @@ body[data-scene="apps"] { --accent: #7A3E8E; --accent-ink: #5F2D70; --focus: #7A
 @media (max-width: 560px) { .cig-note { right: 34px; bottom: calc(40px + 78vw / 13.5); } }
 
 /* ---- small hints that say a thing can be played with; each goes away after its first use ---- */
-.hint { display: inline-block; font-family: var(--mono); font-size: .68rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; pointer-events: none; transition: opacity .45s; }
-.hint.gone { opacity: 0; }
-.hint-sky { position: absolute; z-index: 2; transform: translateX(-50%); padding: 4px 9px; border-radius: 999px; color: #fff; background: rgba(10, 16, 40, .34); animation: bobx 1.8s ease-in-out infinite; }
+.cue { display: inline-block; font-family: var(--mono); font-size: .68rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; pointer-events: none; transition: opacity .45s; }
+.cue.gone { opacity: 0; }
+.cue-sky { position: absolute; z-index: 2; transform: translateX(-50%); padding: 4px 9px; border-radius: 999px; color: #fff; background: rgba(10, 16, 40, .34); animation: bobx 1.8s ease-in-out infinite; }
 @keyframes bobx { 50% { transform: translateX(calc(-50% + 9px)); } }
-.hint-swipe { position: absolute; z-index: 41; top: 16px; right: 20px; padding: 4px 10px; border-radius: 999px; color: #A12657; background: rgba(161, 38, 87, .1); animation: sway 1.8s ease-in-out infinite; }
+.cue-swipe { position: absolute; z-index: 41; top: 16px; right: 20px; padding: 4px 10px; border-radius: 999px; color: #A12657; background: rgba(161, 38, 87, .1); animation: sway 1.8s ease-in-out infinite; }
 @keyframes sway { 50% { transform: translateX(-7px); } }
-.hint-redact { display: block; margin-top: 12px; color: #55514A; }
+.cue-redact { display: block; margin-top: 12px; color: #55514A; }
 .app-note.ask { background: rgba(255, 255, 255, .16); color: #fff; box-shadow: none; min-height: 0; width: fit-content; padding: 8px 14px; border: 1px dashed rgba(255, 255, 255, .5); }
 .app-note.ask i { display: none; }
 .app-note.ask span { font-family: var(--mono); font-size: .72rem; letter-spacing: .07em; text-transform: uppercase; }
 .fact-card.nudge { animation: nudge 1.25s ease-in-out; }
-@media (prefers-reduced-motion: reduce) { .hint-sky, .hint-swipe { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .cue-sky, .cue-swipe { animation: none; } }
 @media (max-width: 560px) { .redact { min-height: 70px; } .redact b { font-size: 1.12rem; } .deck-links { left: 30px; bottom: 26px; } .scene-swipe .paper-head, .fact-card { padding-left: 30px; padding-right: 30px; } }
+
+/* ---- the weather line under the header on the home page ---- */
+.sky-wx { position: absolute; z-index: 2; left: max(22px, calc((100% - var(--wrap)) / 2)); top: calc(var(--hdr, 58px) + 2px); font-family: var(--mono); font-size: .68rem; letter-spacing: .07em; text-transform: uppercase; color: #fff; background: rgba(10, 16, 40, .3); padding: 3px 9px; border-radius: 999px; pointer-events: none; }
+.sky-wx:empty { display: none; }
+@media (max-width: 560px) { .sky-wx { left: 16px; } }
