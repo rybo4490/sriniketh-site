@@ -168,7 +168,7 @@
       { k: 'date', fx: .6, w: 36, h: 62, t: 'When AI Becomes a Dating Alternative', d: 'Generative AI and dating app use.', href: 'dating.html' },
       { k: 'store', fx: .735, w: 72, h: 60, t: 'Out of Stock, Out of Mind: Category Purchasing Across Retailers' },
       { k: 'health', fx: .875, w: 36, h: 62, t: 'The Chilling Effect of Dobbs', d: 'Health app use after the Dobbs opinion was leaked.', href: 'dobbs.html' },
-      { k: 'duck', fx: .48, w: 36, h: 52, t: 'Ducky' }
+      { k: 'duck', fx: .48, w: 34, h: 58, t: 'Ducky' }
     ];
     var duck = THINGS[6], N = 0, T = 0, realNight = 0, hot = null, hotK = 0, ptr = null, tipTimer = null;
     duck.px = null; duck.dir = 1; duck.ph = 0; duck.wait = 1; duck.goal = null; duck.moving = false;
@@ -220,31 +220,43 @@
         box(-28, -58, 56, 13, 2, [196, 52, 52], true); word('OUT OF STOCK', 0, -51.2, 6.7, [255, 255, 255]); lamp(-8, -20, 28, [255, 220, 150], .35);
       },
       duck: function () {
+        ctx.scale(.84, .84);
         var mv = duck.moving && !reduce, bob = mv ? Math.abs(Math.sin(duck.ph)) * 1.4 : Math.sin(T * 2) * .35, wk = WX.kind;
         var sunny = (wk === 'clear' || wk === 'partly') && realNight < .35, wet = wk === 'rain' || wk === 'drizzle', sc = clamp((duck.scare || 0) / .35), wl = WX.dirX * duck.dir, blow = Math.min(5, WX.wind / 7);
-        for (var a = 0; a < 2; a++) { var ph = duck.ph + a * Math.PI, fx = mv ? Math.sin(ph) * 5 : (a ? 2 : -2), lift = mv ? Math.max(0, Math.cos(ph)) * 3.4 : 0, hx = a ? 2.5 : -2.5;
-          ctx.strokeStyle = dim([78, 84, 98]); ctx.lineWidth = 2.3; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(hx, -14 - bob); ctx.lineTo(hx - 3.4 + fx * .5, -7 - lift * .5); ctx.lineTo(hx + fx, -2 - lift); ctx.stroke(); box(hx + fx - 2, -2.8 - lift, 8.4, 2.8, 1.3, [245, 150, 40], true); }
-        ctx.translate(0, -bob);
-        ctx.fillStyle = dim([238, 240, 242]); ctx.beginPath(); ctx.moveTo(-10, -25); ctx.lineTo(-16, -29); ctx.lineTo(-10, -18); ctx.fill();
-        box(-11, -27, 22, 15, 6.5, [238, 240, 242]); box(-11, -20, 22, 1, 0, [192, 198, 206]); box(3, -34, 5, 9, 2, [204, 210, 218]); box(-1, -46, 17, 13, 5, [238, 240, 242]);
-        if (WX.fog) { var hl = ctx.createLinearGradient(13, 0, 64, 0); hl.addColorStop(0, 'rgba(255,240,190,.5)'); hl.addColorStop(1, 'rgba(255,240,190,0)'); ctx.fillStyle = hl; ctx.beginPath(); ctx.moveTo(13, -41); ctx.lineTo(64, -53); ctx.lineTo(64, -27); ctx.lineTo(13, -39); ctx.fill(); }
-        if (sunny) { box(5.4, -43, 11.8, 5.2, 2.3, [20, 22, 28], true); ctx.strokeStyle = dim([20, 22, 28], true); ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(5.6, -41.4); ctx.lineTo(-1, -42.2); ctx.stroke(); ctx.fillStyle = 'rgba(255,255,255,.6)'; ctx.fillRect(12.6, -42.1, 2.6, 1.1); }
-        else { dot(10.5, -40, 3.3 + sc * 1.7, sc ? [255, 255, 255] : [44, 50, 62], !!sc); dot(10.5, -40, 2.1 - sc * .8, mix([20, 24, 32], [110, 235, 255], sc ? 0 : N), true); if (!sc) lamp(10.5, -40, 11, [110, 235, 255], .8); }
-        box(15, -38.6, 7.4, 3.8, 1.7, [245, 150, 40], true);
-        if (WX.snow) {
-          box(-1.6, -49.4, 18.2, 5.6, 2.6, [204, 52, 62], true); box(-2.2, -45.4, 19.4, 2.3, 1.1, [242, 242, 246], true); dot(7.5, -51.6, 2.7, [242, 242, 246], true);
-          box(1.8, -35.6, 7.8, 3.8, 1.7, [204, 52, 62], true); ctx.strokeStyle = dim([204, 52, 62], true); ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(2.6, -33.4); ctx.quadraticCurveTo(-3 + wl * 3, -31, -7 + wl * blow * 1.6, -30 + Math.sin(T * 6) * 1.6); ctx.stroke();
-        } else if (wet) {
-          ctx.fillStyle = dim([247, 200, 60], true); ctx.beginPath(); ctx.arc(7.5, -45.6, 9.2, Math.PI, 0); ctx.closePath(); ctx.fill(); box(-8, -46.6, 26.5, 3, 1.5, [226, 176, 40], true);
-        } else {
-          ctx.strokeStyle = dim([78, 84, 98]); ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(4, -46); ctx.quadraticCurveTo(3.4 + wl * blow * .3, -49.5, 2 + wl * blow, -52); ctx.stroke(); dot(2 + wl * blow, -52.6, 1.5, [226, 70, 70], true); if (Math.sin(T * 3) > .6 || sc) lamp(2 + wl * blow, -52.6, 7, [255, 80, 80], .9);
+        var BLUE = [84, 176, 232], BLUE2 = [58, 142, 204], HI = [150, 212, 246], ORANGE = [240, 128, 38], GREY = [176, 182, 192], DARK = [46, 50, 60];
+        for (var a = 0; a < 2; a++) {
+          var ph = duck.ph + a * Math.PI, fx = mv ? Math.sin(ph) * 5.5 : (a ? 2.5 : -2.5), lift = mv ? Math.max(0, Math.cos(ph)) * 3.6 : 0, hx = a ? 3 : -3, kx = hx + 3 + fx * .45, ky = -9.5 - lift * .5, ax = hx + fx, ay = -3.4 - lift;
+          ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = dim(a ? GREY : [146, 152, 164]); ctx.lineWidth = 3.6; ctx.beginPath(); ctx.moveTo(hx, -17 - bob); ctx.lineTo(kx, ky); ctx.lineTo(ax, ay); ctx.stroke();
+          ctx.strokeStyle = dim(DARK); ctx.lineWidth = 3.6; ctx.beginPath(); ctx.moveTo(hx + (kx - hx) * .25, -17 - bob + (ky + 17 + bob) * .25); ctx.lineTo(hx + (kx - hx) * .7, -17 - bob + (ky + 17 + bob) * .7); ctx.stroke();
+          dot(kx, ky, 2, ORANGE, true); dot(ax, ay, 1.8, ORANGE, true); box(ax - 3.4, -3.4 - lift, 11.5, 3.4, 1.5, ORANGE, true);
         }
+        ctx.translate(0, -bob);
+        box(-9.5, -38, 19, 22, 8.5, BLUE); box(-9.5, -38, 19, 22, 8.5, BLUE); ctx.fillStyle = dim(BLUE2); ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(-9.5, -27, 19, 11, [0, 0, 8.5, 8.5]); else ctx.rect(-9.5, -27, 19, 11); ctx.fill();
+        box(-9.5, -38, 19, 13, 8.5, BLUE); box(-6.5, -36, 8, 3.2, 1.6, HI); box(3.5, -24.5, 7.5, 4, 1.4, ORANGE, true); dot(-1, -19.5, 2.1, ORANGE, true);
+        ctx.strokeStyle = dim([214, 218, 226]); ctx.lineWidth = 4.2; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(.5, -37); ctx.lineTo(3, -45); ctx.stroke(); ctx.strokeStyle = dim(DARK); ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(1.2, -38.5); ctx.lineTo(2.6, -43); ctx.stroke(); dot(3, -45, 2.2, ORANGE, true);
         if (wk === 'storm') {
-          ctx.save(); ctx.translate(-2, -27); ctx.rotate(wl * clamp(WX.wind / 70) * .45);
-          ctx.strokeStyle = dim([70, 60, 50]); ctx.lineWidth = 1.5; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(0, 2); ctx.lineTo(0, -35); ctx.stroke();
-          ctx.fillStyle = dim([247, 200, 60], true); ctx.beginPath(); ctx.arc(0, -33, 21, Math.PI, 0); for (var sx = 3; sx >= 0; sx--) ctx.arc(-15.75 + sx * 10.5, -33, 5.25, 0, Math.PI, true); ctx.closePath(); ctx.fill();
-          ctx.strokeStyle = dim([214, 160, 30], true); ctx.lineWidth = .9; ctx.beginPath(); [-10.5, 0, 10.5].forEach(function (q) { ctx.moveTo(0, -54); ctx.quadraticCurveTo(q * .6, -45, q, -33); }); ctx.stroke(); dot(0, -54.6, 1.4, [70, 60, 50]);
+          ctx.save(); ctx.translate(-5, -30); ctx.rotate(wl * clamp(WX.wind / 70) * .4);
+          ctx.strokeStyle = dim([70, 60, 50]); ctx.lineWidth = 1.6; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(0, 2); ctx.lineTo(0, -42); ctx.stroke();
+          ctx.fillStyle = dim([247, 200, 60], true); ctx.beginPath(); ctx.arc(4, -41, 26, Math.PI, 0); for (var sx = 3; sx >= 0; sx--) ctx.arc(-15.5 + sx * 13, -41, 6.5, 0, Math.PI, true); ctx.closePath(); ctx.fill();
+          ctx.strokeStyle = dim([214, 160, 30], true); ctx.lineWidth = .9; ctx.beginPath(); [-13, 0, 13].forEach(function (q) { ctx.moveTo(4, -67); ctx.quadraticCurveTo(4 + q * .6, -55, 4 + q, -41); }); ctx.stroke(); dot(4, -67.6, 1.5, [70, 60, 50]);
           ctx.restore();
+        }
+        box(-13.5, -65, 30, 21, 9.5, BLUE); ctx.fillStyle = dim(BLUE2); ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(-13.5, -52, 30, 8, [0, 0, 9.5, 9.5]); else ctx.rect(-13.5, -52, 30, 8); ctx.fill(); box(-13.5, -65, 30, 15, 9.5, BLUE); box(-9.5, -62.6, 12, 3.4, 1.7, HI);
+        box(2.2, -61.4, 16.8, 13.4, 6.4, [226, 230, 236]); box(2.2, -61.4, 16.8, 13.4, 6.4, [226, 230, 236]);
+        if (WX.fog) { var hl = ctx.createLinearGradient(18, 0, 70, 0); hl.addColorStop(0, 'rgba(255,240,190,.5)'); hl.addColorStop(1, 'rgba(255,240,190,0)'); ctx.fillStyle = hl; ctx.beginPath(); ctx.moveTo(18, -56); ctx.lineTo(70, -68); ctx.lineTo(70, -40); ctx.lineTo(18, -53); ctx.fill(); }
+        var blink = !sc && !reduce && (T % 4.3) < .13, glow = mix([164, 204, 228], [120, 236, 255], N);
+        [[7.4, 4.5], [14.4, 4]].forEach(function (e) {
+          dot(e[0], -54.7, e[1] + .9, [132, 142, 156]); dot(e[0], -54.7, e[1] + sc * .7, sc ? [255, 255, 255] : glow, true);
+          if (blink) { box(e[0] - e[1] - 1, -54.7 - e[1] - 1, e[1] * 2 + 2, e[1] * 2 + 2, e[1], BLUE); }
+          else { dot(e[0] + .5, -54.5, e[1] * (sc ? .34 : .5), [34, 40, 54], true); ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.beginPath(); ctx.arc(e[0] - e[1] * .35, -54.7 - e[1] * .35, e[1] * .24, 0, 6.2832); ctx.fill(); }
+        });
+        if (!sunny && !blink) lamp(11, -54.7, 15, [120, 236, 255], .6);
+        if (sunny) { box(1.6, -58.6, 18.4, 7.6, 3, [20, 22, 28], true); ctx.strokeStyle = dim([20, 22, 28], true); ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(2, -56.4); ctx.lineTo(-9, -57.4); ctx.stroke(); ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fillRect(13.2, -57.4, 3.6, 1.3); ctx.fillRect(5.6, -57.4, 2.6, 1.3); }
+        if (WX.snow) {
+          box(-13, -70.5, 29, 8, 3.8, [204, 52, 62], true); box(-14.2, -64.6, 31.4, 3, 1.4, [242, 242, 246], true); dot(1.5, -72.4, 3.1, [242, 242, 246], true);
+          box(-2.4, -44.6, 10, 4.4, 2, [204, 52, 62], true); ctx.strokeStyle = dim([204, 52, 62], true); ctx.lineWidth = 3.4; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(-1.4, -42.2); ctx.quadraticCurveTo(-7 + wl * 3, -39, -11 + wl * blow * 1.6, -37.5 + Math.sin(T * 6) * 1.6); ctx.stroke();
+        } else if (wet) {
+          ctx.fillStyle = dim([247, 200, 60], true); ctx.beginPath(); ctx.ellipse(1.5, -64.4, 13.5, 8.5, 0, Math.PI, 0); ctx.closePath(); ctx.fill(); box(-18, -65.6, 39, 3.2, 1.6, [226, 176, 40], true);
         }
       }
     };
