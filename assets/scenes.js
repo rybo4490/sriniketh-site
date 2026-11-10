@@ -114,8 +114,7 @@
       cv.addEventListener('pointermove', function (e) { if (e.pointerType !== 'mouse' && !down) return; touched = true; if (start && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) start.far = true; var p = at(e); rub(p.x, p.y); if (Math.random() < .35) shave(e.clientX, e.clientY); check(performance.now()); });
       cv.addEventListener('pointerup', function () { down = false; lastPt = null; lastCheck = 0; check(performance.now()); if (start && !start.far) reveal(); start = null; }); cv.addEventListener('pointercancel', function () { down = false; lastPt = null; });
       cv.addEventListener('pointerleave', function () { if (!down) lastPt = null; });
-      function demo() { if (touched || done) return; var t0 = null; (function step(ts) { if (touched || done) { lastPt = null; return; } if (t0 === null) t0 = ts; var k = Math.min(1, (ts - t0) / 900), x = 14 + k * w * .5, y = h * .42 + Math.sin(k * 13) * h * .2; rub(x, y); if (k < 1) requestAnimationFrame(step); else lastPt = null; })(performance.now()); }
-      paint(); (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function () { if (!touched) paint(); if (!n) setTimeout(demo, 700); });
+      paint(); (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function () { if (!touched) paint(); });
       window.addEventListener('resize', function () { if (done) return; if (touched) { done = true; cv.remove(); } else paint(); });
     });
   }
