@@ -7,15 +7,17 @@
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&amp;family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
-<link href="assets/style.css?v=28" rel="stylesheet"/>
-<script src="assets/site.js?v=28"></script>
-<script src="assets/analytics.js?v=28"></script>
-<script src="assets/data.js?v=28"></script>
-<script src="assets/charts.js?v=28"></script>
+<link href="assets/style.css?v=39" rel="stylesheet"/>
+<script src="assets/site.js?v=39"></script>
+<script src="assets/sky.js?v=39"></script>
+<script src="assets/analytics.js?v=39"></script>
+<script src="assets/data.js?v=39"></script>
+<script src="assets/charts.js?v=39"></script>
 <title>Sriniketh Vijayaraghavan</title>
 <meta content="Sriniketh Vijayaraghavan, Assistant Professor of Marketing at Mays Business School, Texas A&amp;M University. Research on vice consumption, public policy, AI, crime, digital marketing and privacy." name="description"/>
 </head><body>
-<header class="site-header"><div class="wrap">
+<div class="skyband" aria-hidden="true"><canvas id="sky"></canvas></div>
+<header class="site-header over-sky"><div class="wrap">
 <a class="brand" data-edit="index-38" href="index.html">Sriniketh Vijayaraghavan</a>
 <ul class="nav">
 <li><a data-edit="index-39" href="research.html">Research</a></li>
@@ -24,7 +26,7 @@
 <li><button aria-label="Switch between light and dark" class="theme-toggle" type="button"><svg class="sun" viewbox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg><svg class="moon" viewbox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg></button></li>
 </ul>
 </div></header>
-<main><div class="wrap">
+<main class="home"><div class="wrap">
 <section class="hero">
 <div>
 <img alt="Portrait of Sriniketh Vijayaraghavan" class="hero-photo" height="132" src="assets/headshot.jpg" width="132"/>
@@ -42,17 +44,17 @@
 </div>
 <div class="rollout hero-fig" id="ban">
 <div class="fig" data-fig="cigDraw"><h3 data-edit="index-22">Who became a smoker, by year of birth</h3></div>
-<p class="rollout-caption" data-edit="index-28">On January 2, 1971, cigarette commercials left American radio and television, and so did the anti-smoking advertisements broadcasters had been required to air since 1967. The line stops at the people born in 1953, the last to finish their teens before the ban. Draw where you think it went next, then see the survey. <a class="explore-link" data-edit="index-29" href="cigarettes.html">The paper →</a></p>
+<p class="rollout-caption" data-edit="index-28">On January 2, 1971, cigarette commercials were removed from American radio and television. Broadcasters had been required to air anti-smoking advertisements since 1967, and after the ban they aired far fewer of them. The chart shows people born up to 1953, the last to finish their teens before the ban. Draw your guess for the people born after them, then see the survey. <a class="explore-link" data-edit="index-29" href="cigarettes.html">The paper →</a></p>
 </div>
 </section>
 <section class="section">
 <div class="section-head"><h2 data-edit="index-23">Research</h2><a data-edit="index-47" href="research.html">All papers →</a></div>
-<div class="themes-list">
-<a class="theme-row" href="gambling.html"><h3 data-edit="index-70">Gambling Spillovers</h3><span class="count" data-edit="index-71">Forthcoming</span><p data-edit="index-72">Online sports betting and state lottery sales. <em>Management Science</em>.</p></a>
-<a class="theme-row" href="vice-regulation.html"><h3 data-edit="index-74">Unexpected Outcomes of Vice Regulation</h3><span class="count" data-edit="index-75">Revise and resubmit</span><p data-edit="index-76">Age-verification laws for pornography sites and rape offenses. <em>Journal of Marketing</em>.</p></a>
-<a class="theme-row" href="dating.html"><h3 data-edit="index-78">When AI Becomes a Dating Alternative</h3><span class="count" data-edit="index-79">Revise and resubmit</span><p data-edit="index-80">Generative AI and dating app use. <em>Journal of Marketing Research</em>.</p></a>
-<a class="theme-row" href="dobbs.html"><h3 data-edit="index-82">The Chilling Effect of Dobbs</h3><span class="count" data-edit="index-83">Third round</span><p data-edit="index-84">Health app use after the Dobbs opinion leaked. <em>Information Systems Research</em>.</p></a>
-<a class="theme-row" href="cigarettes.html"><h3 data-edit="index-86">Cigarette Advertising Bans</h3><span class="count" data-edit="index-87">Working paper</span><p data-edit="index-88">The 1971 broadcast ban on cigarette ads and deaths from smoking.</p></a>
+<div class="themes-list doors">
+<a class="theme-row" data-scene="ticket" href="gambling.html"><h3 data-edit="index-70">Gambling Spillovers</h3><span class="count" data-edit="index-71">Forthcoming</span><p data-edit="index-72">Online sports betting and state lottery sales. <em>Management Science</em>.</p></a>
+<a class="theme-row" data-scene="redact" href="vice-regulation.html"><h3 data-edit="index-74">Unexpected Outcomes of Vice Regulation</h3><span class="count" data-edit="index-75">Revise and resubmit</span><p data-edit="index-76">Age-verification laws for pornography sites and rape offenses. <em>Journal of Marketing</em>.</p></a>
+<a class="theme-row" data-scene="swipe" href="dating.html"><h3 data-edit="index-78">When AI Becomes a Dating Alternative</h3><span class="count" data-edit="index-79">Revise and resubmit</span><p data-edit="index-80">Generative AI and dating app use. <em>Journal of Marketing Research</em>.</p></a>
+<a class="theme-row" data-scene="apps" href="dobbs.html"><h3 data-edit="index-82">The Chilling Effect of Dobbs</h3><span class="count" data-edit="index-83">Third round</span><p data-edit="index-84">Health app use after the Dobbs opinion was leaked. <em>Information Systems Research</em>.</p></a>
+<a class="theme-row" data-scene="cig" href="cigarettes.html"><h3 data-edit="index-86">Cigarette Advertising Bans</h3><span class="count" data-edit="index-87">Working paper</span><p data-edit="index-88">The 1971 broadcast ban on cigarette ads and deaths from smoking.</p></a>
 </div>
 </section>
 <section class="section">
@@ -69,7 +71,7 @@
 <ul class="news">
 <li><time data-edit="index-48" datetime="2026-10">Oct 2026</time><span data-edit="index-15">“Unexpected Outcomes of Vice Regulation” invited to revise and resubmit at <em>Journal of Marketing</em>.</span></li>
 <li><time data-edit="index-49" datetime="2026-09">Sep 2026</time><span data-edit="index-16">“When AI Becomes a Dating Alternative” invited to revise and resubmit at <em>Journal of Marketing Research</em>.</span></li>
-<li><time data-edit="index-50" datetime="2026-08">Aug 2026</time><span data-edit="index-17">“The Chilling Effect of Dobbs” enters its third round of review at <em>Information Systems Research</em>.</span></li>
+<li><time data-edit="index-50" datetime="2026-08">Aug 2026</time><span data-edit="index-17">“The Chilling Effect of Dobbs” is in its third round of review at <em>Information Systems Research</em>.</span></li>
 <li><time data-edit="index-51" datetime="2026-07">Jul 2026</time><span data-edit="index-18">“Gambling Spillovers: Evidence from Online Sports Gambling and State Lotteries” accepted at <em>Management Science</em>.</span></li>
 </ul>
 </section>

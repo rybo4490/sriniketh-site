@@ -5,8 +5,42 @@
     var t = root.getAttribute('data-theme'); if (t) return t;
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
-  var saved = stored();
-  if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved);
+  var SKY = window.SKY = (function () {
+    var RAD = Math.PI / 180, tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+    var south = /^(Australia|Antarctica)\/|Auckland|Sao_Paulo|Buenos_Aires|Santiago|Johannesburg|Montevideo|Lima|La_Paz|Asuncion|Harare|Maputo|Windhoek|Fiji/.test(tz);
+    var lat = (south ? -35 : 35) * RAD, off = 0;
+    try { off = parseFloat(sessionStorage.getItem('skyOffset')) || 0; } catch (e) {}
+    var d0 = new Date(), y = d0.getFullYear(), jan = new Date(y, 0, 1).getTimezoneOffset(), jul = new Date(y, 6, 1).getTimezoneOffset();
+    var noon = d0.getTimezoneOffset() < Math.max(jan, jul) ? 13.1 : 12.1;
+    var dc = -23.44 * RAD * Math.cos(2 * Math.PI * (Math.floor((d0 - new Date(y, 0, 0)) / 864e5) + 10) / 365);
+    var dayLen = 2 * Math.acos(Math.max(-1, Math.min(1, -Math.tan(lat) * Math.tan(dc)))) / RAD / 15;
+    function real() { var d = new Date(); return d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600; }
+    function hours() { return ((real() + off) % 24 + 24) % 24; }
+    function alt(t, moon) { var c = moon ? -dc : dc; return Math.asin(Math.sin(lat) * Math.sin(c) + Math.cos(lat) * Math.cos(c) * Math.cos((t - noon) * 15 * RAD)) / RAD; }
+    var KEYS = [
+      [-18, [8, 12, 28], [13, 20, 48], [24, 32, 66]], [-8, [14, 22, 54], [38, 42, 92], [108, 70, 112]], [-3, [26, 44, 100], [118, 92, 150], [236, 132, 100]],
+      [0, [40, 78, 156], [176, 150, 186], [250, 170, 112]], [4, [52, 112, 196], [170, 196, 228], [252, 214, 160]], [12, [50, 118, 208], [150, 200, 240], [226, 238, 246]], [40, [44, 112, 206], [132, 192, 240], [218, 235, 248]]
+    ];
+    function colors(a) {
+      a = Math.max(-18, Math.min(40, a));
+      for (var i = 1; i < KEYS.length; i++) if (a <= KEYS[i][0]) { var A = KEYS[i - 1], B = KEYS[i], k = (a - A[0]) / (B[0] - A[0]); return [1, 2, 3].map(function (j) { return A[j].map(function (v, n) { return Math.round(v + (B[j][n] - v) * k); }); }); }
+    }
+    function apply() {
+      var a = alt(hours()), c = colors(a);
+      root.setAttribute('data-theme', a < -1 ? 'dark' : 'light');
+      ['--sky-a', '--sky-b', '--sky-c'].forEach(function (n, i) { root.style.setProperty(n, 'rgb(' + c[i].join(',') + ')'); });
+    }
+    function setOffset(o) { off = ((o % 24) + 24) % 24; try { sessionStorage.setItem('skyOffset', off); } catch (e) {} apply(); }
+    var anim = null;
+    function shift(h, animate) {
+      if (anim) cancelAnimationFrame(anim);
+      if (!animate) { setOffset(off + h); return; }
+      var from = off, t0 = null;
+      (function step(ts) { if (t0 === null) t0 = ts; var k = Math.min(1, (ts - t0) / 1800), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; setOffset(from + h * e); anim = k < 1 ? requestAnimationFrame(step) : null; })(performance.now());
+    }
+    apply(); setInterval(apply, 60000);
+    return { alt: alt, hours: hours, real: real, noon: noon, dayLen: dayLen, colors: colors, setOffset: setOffset, shift: shift, offset: function () { return off; } };
+  })();
 
   // ---- tile map of the US: row, col on a square grid ----
   var TILES = {
@@ -24,7 +58,7 @@
   // ---- the rollouts, from the papers' own treatment tables ----
   var LAYERS = {
     osg: {
-      label: 'Online sports betting', note: 'Month online sports betting went live in each state, 2018 to 2023, as used in Gambling Spillovers.',
+      label: 'Online sports betting', note: 'The month each state opened online sports betting, 2018 to 2023, as used in Gambling Spillovers.',
       ramp: ['--osg-0', '--osg-1', '--osg-2'],
       dates: { NJ: '2018-08', WV: '2018-12', PA: '2019-05', IA: '2019-08', RI: '2019-09', IN: '2019-10', OR: '2019-10', NH: '2019-12', CO: '2020-05', DC: '2020-05', IL: '2020-06', TN: '2020-11', MI: '2021-01', VA: '2021-01', AZ: '2021-09', WY: '2021-09', CT: '2021-10', LA: '2022-01', NY: '2022-01', AR: '2022-03', KS: '2022-09', MD: '2022-11', OH: '2023-01', MA: '2023-03', KY: '2023-09', FL: '2023-11', ME: '2023-11' }
     },
@@ -34,6 +68,7 @@
       dates: { UT: '2023-05', VA: '2023-07', MS: '2023-07', AR: '2023-08', MT: '2024-01', NC: '2024-01', TX: '2024-03', ID: '2024-07', KS: '2024-07', KY: '2024-07', NE: '2024-07', IN: '2024-07', AL: '2024-10', OK: '2024-11', TN: '2025-01', FL: '2025-01', SC: '2025-01', SD: '2025-07', WY: '2025-07', ND: '2025-08', AZ: '2025-09', MO: '2025-11' }
     }
   };
+  window.SITE_MAP = { TILES: TILES, NAMES: NAMES, DATES: LAYERS.av.dates };
   var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   function fmt(ym) { return ym.length === 4 ? ym : MONTHS[+ym.slice(5, 7) - 1] + ' ' + ym.slice(0, 4); }
   function mix(a, b, t) { return a.map(function (v, i) { return Math.round(v + (b[i] - v) * t); }); }
@@ -127,12 +162,13 @@
     mo.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
   }
 
+  ['pagereveal', 'pageswap'].forEach(function (n) { window.addEventListener(n, function (e) { if (e.viewTransition) { e.viewTransition.ready.catch(function () {}); e.viewTransition.finished.catch(function () {}); } }); });
   document.addEventListener('DOMContentLoaded', function () {
     var b = document.querySelector('.theme-toggle');
     if (b) b.addEventListener('click', function () {
-      var next = effective() === 'dark' ? 'light' : 'dark';
-      root.setAttribute('data-theme', next); if (window.siteTrack) window.siteTrack('theme_toggle', { theme: next });
-      try { localStorage.setItem('theme', next); } catch (e) {}
+      var a = SKY.alt(SKY.hours()), h = SKY.hours(), target = a < -1 ? SKY.noon - 2 : SKY.noon + 10, dh = ((target - h) % 24 + 24) % 24;
+      SKY.shift(dh, !!document.getElementById('sky') && !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      if (window.siteTrack) window.siteTrack('theme_toggle', { theme: a < -1 ? 'light' : 'dark' });
     });
     buildMap();
     var chips = document.querySelectorAll('.chip'); if (!chips.length) return;

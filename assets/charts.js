@@ -512,7 +512,7 @@
       readout: function (g, h) {
         var r71 = h[0], last = h[h.length - 1], g71 = g[1971];
         var drop = (1 - r71.y / 314.7) * 100;
-        return 'You drew $' + fmt0(g71) + ' million for 1971. Cigarette makers spent <strong>$' + fmt0(r71.y) + ' million</strong> in 1971, ' + fmt0(drop) + ' percent less than the $315 million of 1970. The $217 million they had spent on television and radio did not all move to print and billboards. Spending did not return to its 1970 level until ' + last.x + '.';
+        return 'You drew $' + fmt0(g71) + ' million for 1971. Cigarette makers spent <strong>$' + fmt0(r71.y) + ' million</strong> in 1971, ' + fmt0(drop) + ' percent less than the $315 million of 1970. They had spent $217 million on television and radio, and they moved only part of it to print and billboards. Their total spending stayed below its 1970 level until ' + last.x + '.';
       } });
   }
 
@@ -563,7 +563,7 @@
     function draw() {
       var s = T.series[state.k], ticks = []; d.forEach(function (x, i) { if (x.slice(8) === '01') ticks.push(i); });
       var ch = lineChart(plot, [{ label: 'Searches for “' + state.k + '”', pts: s.map(function (v, i) { return { x: i, y: v }; }), cls: 'l-main' }],
-        { xLabel: '2022', yLabel: 'Google search interest (index)', xTicks: ticks, xFmt: lab, vline: leak - 0.5, vlineLabel: 'Draft opinion leaks', ymin: 0, yFmt: fmt0, aria: 'Daily Google searches in the United States' });
+        { xLabel: '2022', yLabel: 'Google search interest (index)', xTicks: ticks, xFmt: lab, vline: leak - 0.5, vlineLabel: 'Draft opinion leaked', ymin: 0, yFmt: fmt0, aria: 'Daily Google searches in the United States' });
       el('line', { x1: ch.X(ruling), x2: ch.X(ruling), y1: 18, y2: 274, class: 'vline' }, ch.svg);
       var t = el('text', { x: ch.X(ruling) + 5, y: 30, class: 'tick' }, ch.svg); t.textContent = 'Court rules';
       var april = s.slice(0, leak).reduce(function (a, v) { return a + v; }, 0) / leak, peak = function (i) { return Math.max.apply(null, s.slice(i, i + 7)) / april; };
@@ -577,7 +577,7 @@
     var D = window.SITE_DATA.dating_desc, U = D.usage, A = 'Dating apps', B = 'AI companions', ia = D.kinds.indexOf(A), ib = D.kinds.indexOf(B);
     var ROUNDS = [
       { q: 'Which one do people spend more time on in a day?', key: 'Minutes on a day of use, median', fmt: function (v) { return fmt1(v) + ' minutes'; }, say: function (w, l) { return w.name + '. A median of ' + w.v + ' on a day of use, compared with ' + l.v + ' on ' + l.lname + '.'; } },
-      { q: 'Which one gets the longer visits?', key: 'Median visit', fmt: function (v) { return fmt0(v) + ' seconds'; }, say: function (w, l) { return w.name + '. The median visit lasts ' + w.v + ', compared with ' + l.v + ' on ' + l.lname + '.'; } },
+      { q: 'Which one do people stay on longer in one visit?', key: 'Median visit', fmt: function (v) { return fmt0(v) + ' seconds'; }, say: function (w, l) { return w.name + '. The median visit lasts ' + w.v + ', compared with ' + l.v + ' on ' + l.lname + '.'; } },
       { q: 'Which one do people open on more days?', key: 'Median days used', fmt: function (v) { return fmt0(v) + ' days'; }, say: function (w, l) { return w.name + '. The median user opens them on ' + w.v + ', compared with ' + l.v + ' for ' + l.lname + '.'; } },
       { q: 'Which one is more often the first thing people open after unlocking their phone?', key: 'First thing after unlocking the phone', fmt: function (v) { return fmt0(v) + ' percent of visits'; }, say: function (w, l) { return w.name + '. ' + w.v + ' are the first thing after unlocking, compared with ' + l.v + ' on ' + l.lname + '.'; } },
       { q: 'Which one has more users aged 18 to 24?', key: 'Aged 18 to 24', fmt: function (v) { return fmt0(v) + ' percent'; }, say: function (w, l) { return w.name + '. ' + w.v + ' of their users are aged 18 to 24, compared with ' + l.v + ' of ' + l.lname + ' users.'; } }
@@ -619,7 +619,7 @@
           var w = { name: [A, B][win], v: R.fmt(vals[win]) }, l = { v: R.fmt(vals[1 - win]), lname: [A, B][1 - win].toLowerCase() };
           say.textContent = R.say(w, l);
           next.textContent = i < ROUNDS.length - 1 ? 'Next' : 'Play again'; next.hidden = false;
-          if (i === ROUNDS.length - 1) { var wins = ROUNDS.filter(function (r) { return U[r.key][ib] > U[r.key][ia]; }).length; tally.textContent = 'AI companions came out ahead in ' + ['', 'one', 'two', 'three', 'four', 'five'][wins] + ' of the five rounds and dating apps in ' + ['', 'one', 'two', 'three', 'four', 'five'][5 - wins] + '. You picked the winner in ' + right + ' of the five.'; tally.hidden = false; track('duel_finish', { figure: 'datingDesc', score: right }); }
+          if (i === ROUNDS.length - 1) { var wins = ROUNDS.filter(function (r) { return U[r.key][ib] > U[r.key][ia]; }).length; tally.textContent = 'AI companions had the higher number in ' + ['', 'one', 'two', 'three', 'four', 'five'][wins] + ' of the five rounds and dating apps in ' + ['', 'one', 'two', 'three', 'four', 'five'][5 - wins] + '. You picked the winner in ' + right + ' of the five.'; tally.hidden = false; track('duel_finish', { figure: 'datingDesc', score: right }); }
         });
       });
     }
