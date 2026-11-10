@@ -34,10 +34,18 @@
       wxEl.textContent = (o.city ? o.city + ': ' : '') + bits.filter(Boolean).join(', ');
       if (window.__skyDraw) window.__skyDraw();
     }
+    var FAKE = { clear: [0, 5, 6], cloudy: [3, 100, 7], fog: [45, 100, 3], drizzle: [53, 100, 8], rain: [63, 100, 12], storm: [95, 100, 24], snow: [73, 100, 9], wind: [1, 20, 30] }, picked = '';
+    function fake(q) { var F = FAKE[q]; if (!F) return false; picked = q; setWx({ code: F[0], cover: F[1], wind: F[2], dir: 270, temp: q === 'snow' ? 28 : 68, city: '' }); mark(); return true; }
+    function mark() { var bs = document.querySelectorAll('.wx-pick button'); for (var n = 0; n < bs.length; n++) bs[n].setAttribute('aria-pressed', bs[n].dataset.wx === picked ? 'true' : 'false'); }
+    function picker() {
+      if (document.querySelector('.wx-pick')) return; var box = document.createElement('div'); box.className = 'wx-pick'; cv.parentNode.appendChild(box);
+      ['clear', 'cloudy', 'fog', 'drizzle', 'rain', 'storm', 'snow', 'wind'].forEach(function (k) { var b = document.createElement('button'); b.type = 'button'; b.dataset.wx = k; b.textContent = k.charAt(0).toUpperCase() + k.slice(1); b.addEventListener('click', function () { fake(k); }); box.appendChild(b); });
+      mark();
+    }
     function loadWx() {
       var q = ''; try { q = new URLSearchParams(location.search).get('wx') || ''; } catch (e) {}
-      var FAKE = { clear: [0, 5, 6], cloudy: [3, 100, 7], fog: [45, 100, 3], drizzle: [53, 100, 8], rain: [63, 100, 12], storm: [95, 100, 24], snow: [73, 100, 9], wind: [1, 20, 30] };
-      if (FAKE[q]) { setWx({ code: FAKE[q][0], cover: FAKE[q][1], wind: FAKE[q][2], dir: 270, temp: q === 'snow' ? 28 : 68, city: '' }); return; }
+      if (q) picker();
+      if (fake(q)) return;
       try { var c = JSON.parse(sessionStorage.getItem('skyWx') || 'null'); if (c && Date.now() - c.t < 20 * 6e4) { setWx(c); return; } } catch (e) {}
       if (!window.fetch) return;
       fetch('https://get.geojs.io/v1/ip/geo.json').then(function (x) { return x.json(); }).then(function (gj) {
@@ -52,6 +60,8 @@
       }).catch(function () {});
     }
     window.__wx = function (kind, wind) { var F = { clear: 0, cloudy: 3, fog: 45, drizzle: 53, rain: 63, storm: 95, snow: 73 }; setWx({ code: F[kind] || 0, cover: kind === 'clear' ? 5 : 100, wind: wind || 6, dir: 270, temp: kind === 'snow' ? 28 : 68, city: '' }); };
+    function inArtifact() { return !!(window.claude && typeof window.claude.use === 'function'); }
+    if (inArtifact()) picker(); else setTimeout(function () { if (inArtifact()) picker(); }, 1500);
 
     function size() { if (header) document.documentElement.style.setProperty('--hdr', header.offsetHeight + 'px'); dpr = Math.min(2, window.devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
     function geo() { var top = (header ? header.offsetHeight : 58) + 34, hor = H * .79; return { top: top, hor: hor, arc: hor - top, span: Math.min(.8, .9 - 90 / Math.max(W, 320)) }; }

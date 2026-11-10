@@ -53,8 +53,8 @@
     window.addEventListener('pointermove', function (e) { var dx = e.clientX - mouse.x, dy = e.clientY - mouse.y; if (Math.abs(dx) < 200) { mouse.vx += dx; mouse.vy += dy; wind.x += dx * .06; gust = Math.min(2.5, gust + Math.abs(dx) * .004); } mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
     function step(dt) {
       clock += dt; acc += dt;
-      var b = ember.getBoundingClientRect(), ex = b.left + b.width * .55, ey = b.top + b.height * .2, rate = clock < 5 ? .008 : .01;
-      while (acc > rate) { acc -= rate; var st = (seq++) % 3, hz = Math.random() < .16, j = hz ? 9 : 1.7; parts.push({ x: ex + (st - 1) * 1.7 + Math.sin(clock * 2.6 + st * 2.1) * 1.1, y: ey, age: Math.random() * rate, life: (hz ? 6 : 7.5) + Math.random() * 4, jx: (Math.random() - .5) * j, jy: (Math.random() - .5) * j * .6, s: .8 + Math.random() * .5, hz: hz, h: 0 }); }
+      var b = ember.getBoundingClientRect(), ex = b.left + b.width * .55, ey = b.top + b.height * .2, rate = clock < 5 ? .0055 : .007;
+      while (acc > rate) { acc -= rate; var st = (seq++) % 3, hz = Math.random() < .26, j = hz ? 11 : 2.6; parts.push({ x: ex + (st - 1) * 2.6 + Math.sin(clock * 2.6 + st * 2.1) * 1.4, y: ey, age: Math.random() * rate, life: (hz ? 6 : 7.5) + Math.random() * 4, jx: (Math.random() - .5) * j, jy: (Math.random() - .5) * j * .6, s: .8 + Math.random() * .5, hz: hz, h: 0 }); }
       var breeze = Math.sin(clock * .23) * 5 + Math.sin(clock * .071 + 1) * 4 + 3;
       wind.x += (breeze - wind.x) * Math.min(1, dt * 1.3); wind.y *= Math.exp(-dt * 2.2); gust *= Math.exp(-dt * 1.1);
       ctx.clearRect(0, 0, W, H);
@@ -66,7 +66,7 @@
         var vx = u * turb + wind.x * (.25 + h) + 7 * h + p.jx * h, vy = -rise + v * turb * .8 + wind.y * (.3 + h) + p.jy * h;
         var dx = p.x - mouse.x, dy = p.y - mouse.y, d2 = dx * dx + dy * dy; if (d2 < 22500) { var f = (1 - d2 / 22500); vx += mouse.vx * f * 9; vy += mouse.vy * f * 6; }
         p.x += vx * dt; p.y += vy * dt;
-        var k = p.age / p.life, r = p.hz ? (2.5 + Math.pow(p.age, 1.3) * 7.5) * p.s : (1.15 + Math.pow(p.age, 1.15) * 2.5) * p.s, a = Math.min(1, p.age * 9) * Math.pow(1 - k, 1.25) * (p.hz ? .06 / (1 + p.age * .5) : .34 / (1 + p.age * .75) + .02);
+        var k = p.age / p.life, r = p.hz ? (4 + Math.pow(p.age, 1.3) * 9.5) * p.s : (2 + Math.pow(p.age, 1.2) * 4.4) * p.s, a = Math.min(1, p.age * 9) * Math.pow(1 - k, 1.25) * (p.hz ? .085 / (1 + p.age * .45) : .36 / (1 + p.age * .7) + .024);
         ctx.globalAlpha = a; ctx.drawImage(sprite, p.x - r, p.y - r, r * 2, r * 2);
       }
       mouse.vx *= .6; mouse.vy *= .6;

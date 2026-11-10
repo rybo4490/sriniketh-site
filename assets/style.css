@@ -559,3 +559,10 @@ body[data-scene="apps"] { --accent: #7A3E8E; --accent-ink: #5F2D70; --focus: #7A
 .sky-wx { position: absolute; z-index: 2; left: max(22px, calc((100% - var(--wrap)) / 2)); top: calc(var(--hdr, 58px) + 2px); font-family: var(--mono); font-size: .68rem; letter-spacing: .07em; text-transform: uppercase; color: #fff; background: rgba(10, 16, 40, .3); padding: 3px 9px; border-radius: 999px; pointer-events: none; }
 .sky-wx:empty { display: none; }
 @media (max-width: 560px) { .sky-wx { left: 16px; } }
+
+/* ---- weather picker: shown only in the claude.ai copy, or when the address has ?wx= ---- */
+.wx-pick { position: absolute; z-index: 3; left: max(22px, calc((100% - var(--wrap)) / 2)); top: calc(var(--hdr, 58px) + 30px); display: flex; flex-wrap: wrap; gap: 5px; max-width: min(430px, calc(100% - 32px)); }
+.wx-pick button { font-family: var(--mono); font-size: .66rem; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: rgba(10, 16, 40, .34); border: 1px solid rgba(255, 255, 255, .35); border-radius: 999px; padding: 4px 9px; cursor: pointer; }
+.wx-pick button:hover { background: rgba(10, 16, 40, .55); }
+.wx-pick button[aria-pressed="true"] { background: #fff; color: #10162A; border-color: #fff; }
+@media (max-width: 560px) { .wx-pick { left: 16px; } }
